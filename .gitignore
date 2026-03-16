@@ -1,0 +1,16 @@
+# Node
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+
+# Build
+dist/
+apps/*/dist/
+packages/*/dist/
+
+# IDE
+.vscode/
+.DS_Store
+todo.md
+data.json
+apps/backend/tsconfig.build.tsbuildinfo
