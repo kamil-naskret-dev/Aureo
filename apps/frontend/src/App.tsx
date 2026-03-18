@@ -1,3 +1,9 @@
+import { Button } from '@aureo/ui';
+
 export const App = () => {
-  return <div>App!</div>;
+  return (
+    <div>
+      <Button>asd</Button>
+    </div>
+  );
 };

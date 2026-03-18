@@ -1,1 +1,2 @@
-@import 'tailwindcss';
+@import '@aureo/ui/styles/globals.css';
+@source '../../../../packages/ui/src';

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "css": "src/styles/globals.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "config": "../../apps/frontend/tailwind.config.ts"
+  },
+  "aliases": {
+    "components": "@aureo/ui/components",
+    "utils": "@aureo/ui/lib/utils",
+    "ui": "@aureo/ui/components/ui",
+    "lib": "@aureo/ui/lib",
+    "hooks": "@aureo/ui/hooks"
+  }
+}
