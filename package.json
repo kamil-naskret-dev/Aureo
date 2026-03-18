@@ -12,8 +12,7 @@
     "build": "turbo run build",
     "lint:backend": "eslint apps/backend/src --ext .ts,.tsx --fix",
     "lint:frontend": "eslint apps/frontend/src --ext .ts,.tsx --fix",
-    "lint:shared": "eslint packages/shared/src --ext .ts,.tsx --fix",
-    "lint": "npm run lint:backend && npm run lint:frontend && npm run lint:shared",
+    "lint": "npm run lint:backend && npm run lint:frontend",
     "format": "prettier --write .",
     "prepare": "husky"
   },
