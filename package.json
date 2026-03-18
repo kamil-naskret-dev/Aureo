@@ -8,7 +8,7 @@
   ],
   "packageManager": "npm@11.6.2",
   "scripts": {
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "build": "turbo run build",
     "lint:backend": "eslint apps/backend/src --ext .ts,.tsx --fix",
     "lint:frontend": "eslint apps/frontend/src --ext .ts,.tsx --fix",
@@ -28,9 +28,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
     "prettier": "^3.6.2",
-    "turbo": "latest",
-    "typescript": "^5.6.3",
-    "vite-tsconfig-paths": "^6.0.3"
+    "turbo": "^2.8.18",
+    "typescript": "^5.6.3"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,css,scss,html,md}": [
