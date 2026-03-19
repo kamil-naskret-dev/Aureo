@@ -1,12 +1,4 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@aureo/ui": ["../../packages/ui/src/index.ts"],
-      "@aureo/ui/*": ["../../packages/ui/src/*"]
-    }
-  },
-  "references": [{ "path": "./tsconfig.app.json" }, { "path": "../../packages/ui" }]
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
