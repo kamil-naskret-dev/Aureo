@@ -1,0 +1,63 @@
+{
+  "files": {
+    "packages/ui/dist/components": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    "packages/ui/dist/lib": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    "packages/ui/dist/components/ui/button.d.ts": {
+      "size": 676,
+      "mtime_nanos": 1773932966915832000,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/.turbo/turbo-build.log": {
+      "size": 40,
+      "mtime_nanos": 1774109607468865400,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/dist": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    "packages/ui/dist/components/ui": { "size": 0, "mtime_nanos": 0, "mode": 0, "is_dir": true },
+    "packages/ui/dist/index.d.ts": {
+      "size": 74,
+      "mtime_nanos": 1773932966918147800,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/dist/index.js": {
+      "size": 74,
+      "mtime_nanos": 1773932966917139700,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/dist/components/ui/button.js": {
+      "size": 1733,
+      "mtime_nanos": 1773932966888158800,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/dist/lib/utils.d.ts": {
+      "size": 101,
+      "mtime_nanos": 1773932966883129800,
+      "mode": 420,
+      "is_dir": false
+    },
+    "packages/ui/dist/lib/utils.js": {
+      "size": 139,
+      "mtime_nanos": 1773932966879130400,
+      "mode": 420,
+      "is_dir": false
+    }
+  },
+  "order": [
+    "packages/ui/.turbo/turbo-build.log",
+    "packages/ui/dist",
+    "packages/ui/dist/components",
+    "packages/ui/dist/components/ui",
+    "packages/ui/dist/components/ui/button.d.ts",
+    "packages/ui/dist/components/ui/button.js",
+    "packages/ui/dist/index.d.ts",
+    "packages/ui/dist/index.js",
+    "packages/ui/dist/lib",
+    "packages/ui/dist/lib/utils.d.ts",
+    "packages/ui/dist/lib/utils.js"
+  ]
+}

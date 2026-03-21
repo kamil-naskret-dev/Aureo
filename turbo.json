@@ -14,7 +14,8 @@
     },
     "lint": {
       "outputs": [],
-      "inputs": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", ".eslintrc.json"]
+      "inputs": ["src/**", "packages/**", "**/*.ts", "**/*.tsx", "**/*.js", ".eslintrc.json"],
+      "cache": false
     },
     "format": {
       "outputs": [],

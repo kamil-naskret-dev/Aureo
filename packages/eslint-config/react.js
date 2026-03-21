@@ -5,6 +5,7 @@ import baseConfig from './base.js';
 export default [
   ...baseConfig,
   {
+    ignores: ['node_modules', 'dist', '**/dist/**', '**/build/**', '**/*.scss'],
     plugins: {
       react: reactPlugin,
       'react-hooks': hooksPlugin,
