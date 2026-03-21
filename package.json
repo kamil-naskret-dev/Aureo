@@ -13,8 +13,7 @@
     "lint:backend": "eslint apps/backend/src --ext .ts,.tsx --fix",
     "lint:frontend": "eslint apps/frontend/src --ext .ts,.tsx --fix",
     "lint": "npm run lint:backend && npm run lint:frontend",
-    "format": "prettier --write .",
-    "prepare": "husky"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.46.0",
