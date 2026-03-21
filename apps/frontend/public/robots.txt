@@ -1,0 +1,8 @@
+# Allow all public pages
+User-agent: *
+Disallow:
+
+Disallow: /dashboard
+Disallow: /_protected/
+
+Sitemap: https://aureo.app/sitemap.xml

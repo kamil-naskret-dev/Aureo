@@ -2,7 +2,10 @@
   "extends": "@aureo/ts-config/react",
   "compilerOptions": {
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "@aureo/ui/*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }
