@@ -1,9 +1,6 @@
-import { Button } from '@aureo/ui';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from './router';
 
 export const App = () => {
-  return (
-    <div>
-      <Button>asd</Button>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 };
