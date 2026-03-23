@@ -8,80 +8,80 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root';
-import { Route as RegisterRouteImport } from './routes/register';
-import { Route as SplatRouteImport } from './routes/$splat';
-import { Route as IndexRouteImport } from './routes/index';
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as SplatRouteImport } from './routes/$splat'
+import { Route as IndexRouteImport } from './routes/index'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$splat',
   path: '/$splat',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/$splat': typeof SplatRoute;
-  '/register': typeof RegisterRoute;
+  '/': typeof IndexRoute
+  '/$splat': typeof SplatRoute
+  '/register': typeof RegisterRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/$splat': typeof SplatRoute;
-  '/register': typeof RegisterRoute;
+  '/': typeof IndexRoute
+  '/$splat': typeof SplatRoute
+  '/register': typeof RegisterRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  '/': typeof IndexRoute;
-  '/$splat': typeof SplatRoute;
-  '/register': typeof RegisterRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/$splat': typeof SplatRoute
+  '/register': typeof RegisterRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/$splat' | '/register';
-  fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/$splat' | '/register';
-  id: '__root__' | '/' | '/$splat' | '/register';
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/$splat' | '/register'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/$splat' | '/register'
+  id: '__root__' | '/' | '/$splat' | '/register'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  SplatRoute: typeof SplatRoute;
-  RegisterRoute: typeof RegisterRoute;
+  IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/register': {
-      id: '/register';
-      path: '/register';
-      fullPath: '/register';
-      preLoaderRoute: typeof RegisterRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$splat': {
-      id: '/$splat';
-      path: '/$splat';
-      fullPath: '/$splat';
-      preLoaderRoute: typeof SplatRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/$splat'
+      path: '/$splat'
+      fullPath: '/$splat'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,7 +89,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   RegisterRoute: RegisterRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
