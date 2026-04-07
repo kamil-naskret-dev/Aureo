@@ -1,0 +1,11 @@
+// Aureo — Prisma schema
+// Domain models (User, Bookmark, Tag, Collection) will be added in subsequent modules.
+// Connection URL is configured in prisma.config.ts (Prisma 7+).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}

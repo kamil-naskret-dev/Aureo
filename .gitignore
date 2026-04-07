@@ -14,3 +14,5 @@ packages/*/dist/
 todo.md
 data.json
 apps/backend/tsconfig.build.tsbuildinfo
+CLAUDE.md
+.claude

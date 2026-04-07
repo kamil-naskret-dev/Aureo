@@ -1,7 +1,6 @@
 {
   "extends": "@aureo/ts-config/react",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@aureo/ui": ["../../packages/ui/src/index.ts"],
