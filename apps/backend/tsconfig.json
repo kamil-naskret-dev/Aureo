@@ -1,8 +1,8 @@
 {
   "extends": "@aureo/ts-config/nest",
   "compilerOptions": {
+    "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "removeComments": true,
     "sourceMap": true,
