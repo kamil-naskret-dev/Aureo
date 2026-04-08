@@ -12,76 +12,91 @@ import {
   SWAGGER_TITLE,
   SWAGGER_VERSION,
 } from './common/constants/swagger.constants.js';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
 import { AppConfig } from './config/app.config.js';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, {
-    // Disable the default NestJS logger — nestjs-pino replaces it.
-    bufferLogs: true,
-  });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
-  // ── Logging ────────────────────────────────────────────────────────────────
   app.useLogger(app.get(Logger));
 
-  // ── Config ─────────────────────────────────────────────────────────────────
   const configService = app.get(ConfigService);
-  const appConfig = configService.get<AppConfig>('app')!;
+  const appConfig = configService.getOrThrow<AppConfig>('app');
 
-  // ── Security ───────────────────────────────────────────────────────────────
-  app.use(helmet());
+  const isProduction = appConfig.nodeEnv === 'production';
 
-  // ── CORS ───────────────────────────────────────────────────────────────────
+  app.use(
+    helmet({
+      contentSecurityPolicy: isProduction
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'"],
+              objectSrc: ["'none'"],
+              upgradeInsecureRequests: [],
+            },
+          }
+        : false,
+      crossOriginEmbedderPolicy: false,
+      referrerPolicy: { policy: 'no-referrer' },
+      hsts: isProduction
+        ? { maxAge: 31_536_000, includeSubDomains: true }
+        : false,
+    }),
+  );
+
   app.enableCors({
-    origin: appConfig.corsOrigin,
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin || appConfig.corsOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    maxAge: 86_400,
   });
 
-  // ── Global prefix ──────────────────────────────────────────────────────────
   app.setGlobalPrefix(appConfig.apiPrefix);
 
-  // ── Global pipes ───────────────────────────────────────────────────────────
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Strip properties not in DTO
-      transform: true, // Auto-transform payloads to DTO class instances
-      forbidNonWhitelisted: true, // Throw on unknown properties
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
       transformOptions: {
-        enableImplicitConversion: true, // Convert query params to correct types automatically
+        enableImplicitConversion: true,
       },
     }),
   );
 
-  // ── Global filters ─────────────────────────────────────────────────────────
-  app.useGlobalFilters(new HttpExceptionFilter());
-
-  // ── Global interceptors ────────────────────────────────────────────────────
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // ── Swagger ────────────────────────────────────────────────────────────────
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(SWAGGER_TITLE)
-    .setDescription(SWAGGER_DESCRIPTION)
-    .setVersion(SWAGGER_VERSION)
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      SWAGGER_BEARER_NAME,
-    )
-    .build();
+  if (!isProduction) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(SWAGGER_TITLE)
+      .setDescription(SWAGGER_DESCRIPTION)
+      .setVersion(SWAGGER_VERSION)
+      .addBearerAuth(
+        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+        SWAGGER_BEARER_NAME,
+      )
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup(`${appConfig.apiPrefix}/docs`, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup(`${appConfig.apiPrefix}/docs`, app, document, {
+      swaggerOptions: { persistAuthorization: true },
+    });
+  }
 
-  // ── Graceful shutdown ──────────────────────────────────────────────────────
   app.enableShutdownHooks();
 
-  // ── Listen ─────────────────────────────────────────────────────────────────
   await app.listen(appConfig.port);
 }
 
-bootstrap();
+bootstrap().catch(console.error);
