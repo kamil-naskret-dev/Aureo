@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Field, FieldError, FieldGroup, FieldLabel, Input } from '@aureo/ui';
+import { Button, Field, FieldError, FieldGroup, FieldLabel, Input, Spinner } from '@aureo/ui';
 import { AlertCircle } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { LoginFormValues, LoginSchema } from '../schemas/login-schema';
@@ -7,10 +7,11 @@ import { LoginFormValues, LoginSchema } from '../schemas/login-schema';
 export const LoginForm = () => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
+    defaultValues: { email: '', password: '' },
   });
 
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = form;
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -58,8 +59,9 @@ export const LoginForm = () => {
           )}
         />
       </FieldGroup>
-      <Button type="submit" size="lg">
-        Log in
+      <Button type="submit" size="lg" disabled={isSubmitting}>
+        {isSubmitting && <Spinner />}
+        {isSubmitting ? 'Logging in...' : 'Log in'}
       </Button>
     </form>
   );
