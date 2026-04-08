@@ -1,43 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input, Label } from '@aureo/ui';
+import { Button, Field, FieldError, FieldGroup, FieldLabel, Input, Spinner } from '@aureo/ui';
 import { AlertCircle } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Enter a valid email address'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { Controller, useForm } from 'react-hook-form';
+import { LoginFormValues, LoginSchema } from '../schemas/login-schema';
 
 export const LoginForm = () => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: { email: '', password: '' },
   });
 
-  const onSubmit = async () => {
-    try {
-      // TODO: call login API
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      throw new Error('demo');
-    } catch {
-      setError('root', {
-        message: 'Invalid email or password. Please try again.',
-      });
-    }
+  const {
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const onSubmit = async (data: LoginFormValues) => {
+    console.log(data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
       {errors.root && (
         <div
           role="alert"
@@ -48,44 +30,38 @@ export const LoginForm = () => {
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          aria-invalid={!!errors.email}
-          className={errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}
-          {...register('email')}
+      <FieldGroup>
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input {...field} id="email" aria-invalid={fieldState.invalid} autoComplete="off" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
         />
-        {errors.email && (
-          <p className="text-xs text-destructive" role="alert">
-            {errors.email.message}
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          aria-invalid={!!errors.password}
-          className={errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}
-          {...register('password')}
+        <Controller
+          name="password"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                {...field}
+                id="password"
+                aria-invalid={fieldState.invalid}
+                autoComplete="off"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
         />
-        {errors.password && (
-          <p className="text-xs text-destructive" role="alert">
-            {errors.password.message}
-          </p>
-        )}
-      </div>
-
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Logging in…' : 'Log in'}
+      </FieldGroup>
+      <Button type="submit" size="lg" disabled={isSubmitting}>
+        {isSubmitting && <Spinner />}
+        {isSubmitting ? 'Logging in...' : 'Log in'}
       </Button>
     </form>
   );
