@@ -4,7 +4,7 @@ export interface AppConfig {
   port: number;
   nodeEnv: string;
   apiPrefix: string;
-  corsOrigin: string;
+  corsOrigins: string[];
 }
 
 export default registerAs(
@@ -13,6 +13,8 @@ export default registerAs(
     port: parseInt(process.env.PORT ?? '3000', 10),
     nodeEnv: process.env.NODE_ENV ?? 'development',
     apiPrefix: process.env.API_PREFIX ?? 'api',
-    corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+    corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+      .split(',')
+      .map((o) => o.trim()),
   }),
 );
