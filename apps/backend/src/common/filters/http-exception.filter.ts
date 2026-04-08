@@ -34,7 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       error = 'Error';
     } else if (exceptionResponse && typeof exceptionResponse === 'object') {
       const resp = exceptionResponse as Record<string, unknown>;
-      // ValidationPipe returns { message: string[] } — join all errors into one string
+
       message = Array.isArray(resp['message'])
         ? (resp['message'] as string[]).join('; ')
         : ((resp['message'] as string) ?? 'An error occurred');
@@ -44,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       error = 'Internal Server Error';
     }
 
-    if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
+    if (statusCode >= 500) {
       this.logger.error({ exception }, 'Unhandled exception');
     }
 

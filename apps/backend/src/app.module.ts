@@ -19,7 +19,6 @@ import { PrismaModule } from './prisma/prisma.module.js';
       validate,
     }),
 
-    // Structured logging — pino-pretty in development, JSON in production.
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
@@ -40,8 +39,6 @@ import { PrismaModule } from './prisma/prisma.module.js';
       },
     }),
 
-    // Rate limiting: 100 requests per 60 seconds per IP by default.
-    // Individual routes can override with @Throttle().
     ThrottlerModule.forRoot([
       {
         ttl: 60_000,
