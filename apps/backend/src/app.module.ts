@@ -4,12 +4,13 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
-import { HttpExceptionFilter } from './common/filters/http-exception.filter.js';
-import appConfig, { AppConfig } from './config/app.config.js';
-import { validate } from './config/config.validation.js';
-import databaseConfig from './config/database.config.js';
-import { HealthModule } from './health/health.module.js';
-import { PrismaModule } from './prisma/prisma.module.js';
+import { AuthModule } from './auth/auth.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import appConfig, { AppConfig } from './config/app.config';
+import { validate } from './config/config.validation';
+import databaseConfig from './config/database.config';
+import { HealthModule } from './health/health.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 
     PrismaModule,
     HealthModule,
+    AuthModule,
   ],
   providers: [
     {

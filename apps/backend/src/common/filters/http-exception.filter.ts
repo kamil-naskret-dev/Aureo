@@ -26,7 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const exceptionResponse = isHttpException ? exception.getResponse() : null;
 
-    let message: string;
+    let message: string | string[];
     let error: string;
 
     if (typeof exceptionResponse === 'string') {
@@ -36,7 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const resp = exceptionResponse as Record<string, unknown>;
 
       message = Array.isArray(resp['message'])
-        ? (resp['message'] as string[]).join('; ')
+        ? (resp['message'] as string[])
         : ((resp['message'] as string) ?? 'An error occurred');
       error = (resp['error'] as string) ?? 'Error';
     } else {
