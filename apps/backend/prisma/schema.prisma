@@ -43,8 +43,7 @@ model User {
 model UserProfile {
   id           String    @id @default(cuid())
   userId       String    @unique
-  firstName    String?
-  lastName     String?
+  name         String?
   avatarUrl    String?
   bio          String?
   lastActiveAt DateTime?
