@@ -8,6 +8,8 @@ const envSchema = z.object({
   API_PREFIX: z.string().default('api'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   DATABASE_URL: z.string().min(1),
+  JWT_SECRET: z.string().min(32),
+  JWT_EXPIRES_IN: z.string().default('15m'),
 });
 
 export type Env = z.infer<typeof envSchema>;
