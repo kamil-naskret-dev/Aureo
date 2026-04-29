@@ -9,6 +9,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import appConfig, { AppConfig } from './config/app.config';
 import { validate } from './config/config.validation';
 import databaseConfig from './config/database.config';
+import { jwtConfig } from './config/jwt.config';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -16,7 +17,7 @@ import { PrismaModule } from './prisma/prisma.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, jwtConfig],
       validate,
     }),
 
