@@ -20,19 +20,22 @@ import {
 import * as Express from 'express';
 
 import { SWAGGER_TAGS } from '../common/constants/swagger.constants';
-import { REFRESH_TOKEN_TTL_MS } from '../token/token.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
-
-const REFRESH_TOKEN_COOKIE = 'refreshToken';
+import { RequestMeta } from '../common/decorators/request-meta.decorator';
+import { type RequestMetaType } from '../common/types/request-meta.type';
+import { CookieService } from './infrastructure/cookie/cookie.service';
 
 @ApiTags(SWAGGER_TAGS.AUTH)
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+  ) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -57,21 +60,35 @@ export class AuthController {
   @ApiForbiddenResponse({ description: 'Email not verified.' })
   async login(
     @Body() dto: LoginDto,
-    @Req() req: Express.Request,
+    @RequestMeta() meta: RequestMetaType,
     @Res({ passthrough: true }) res: Express.Response,
   ): Promise<LoginResponseDto> {
-    const { response, refreshToken } = await this.authService.login(dto, {
-      userAgent: req.headers['user-agent'] ?? 'unknown',
-      ipAddress: req.ip ?? req.socket?.remoteAddress ?? 'unknown',
-    });
+    const { response, refreshToken } = await this.authService.login(dto, meta);
 
-    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: REFRESH_TOKEN_TTL_MS,
-      path: '/',
-    });
+    this.cookieService.setRefreshToken(res, refreshToken);
+
+    return response;
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token using refresh token cookie' })
+  @ApiOkResponse({ type: LoginResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid refresh token.' })
+  @ApiForbiddenResponse({ description: 'Account banned.' })
+  async refresh(
+    @Req() req: Express.Request,
+    @RequestMeta() meta: RequestMetaType,
+    @Res({ passthrough: true }) res: Express.Response,
+  ): Promise<LoginResponseDto> {
+    const refreshToken = this.cookieService.getRefreshToken(req);
+
+    const { response, newRefreshToken } = await this.authService.refresh(
+      refreshToken,
+      meta,
+    );
+
+    this.cookieService.setRefreshToken(res, newRefreshToken);
 
     return response;
   }

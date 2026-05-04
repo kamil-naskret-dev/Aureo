@@ -8,15 +8,15 @@ import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-import { TokenService } from '../token/token.service';
+import { TokenService } from './infrastructure/token/token.service';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { isUniqueConstraintError } from '../prisma/utils/prisma-error.util';
-
-const SALT_ROUNDS = 12;
+import { PASSWORD_SALT_ROUNDS } from './auth.constants';
+import { RequestMetaType } from '../common/types/request-meta.type';
 
 @Injectable()
 export class AuthService {
@@ -26,8 +26,23 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
+  private generateAccessToken(user: {
+    id: string;
+    email: string;
+    role: string;
+  }): string {
+    return this.jwt.sign({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
+  }
+
   async register(dto: RegisterDto): Promise<RegisterResponseDto> {
-    const hashedPassword = await bcrypt.hash(dto.password, SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      dto.password,
+      PASSWORD_SALT_ROUNDS,
+    );
 
     try {
       await this.users.create({
@@ -50,7 +65,7 @@ export class AuthService {
 
   async login(
     dto: LoginDto,
-    meta: { userAgent?: string; ipAddress?: string },
+    meta: RequestMetaType,
   ): Promise<{ response: LoginResponseDto; refreshToken: string }> {
     const user = await this.users.findByEmail(dto.email);
 
@@ -68,16 +83,11 @@ export class AuthService {
       throw new ForbiddenException('Please verify your email first');
     }
 
-    const accessToken = this.jwt.sign({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const accessToken = this.generateAccessToken(user);
 
     const refreshToken = await this.tokens.createRefreshToken({
       userId: user.id,
-      userAgent: meta.userAgent,
-      ipAddress: meta.ipAddress,
+      ...meta,
     });
 
     return {
@@ -86,6 +96,40 @@ export class AuthService {
         user: { id: user.id, email: user.email, role: user.role },
       },
       refreshToken,
+    };
+  }
+
+  async refresh(
+    rawToken: string | undefined,
+    meta: RequestMetaType,
+  ): Promise<{ response: LoginResponseDto; newRefreshToken: string }> {
+    if (!rawToken) {
+      throw new UnauthorizedException('Missing refresh token');
+    }
+
+    const { rawToken: newRawToken, userId } =
+      await this.tokens.rotateRefreshToken(rawToken, meta);
+
+    const user = await this.users.findById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    // @TODO: Handle BANNED status
+    // if (user.status === UserStatus.BANNED) {
+    //   await this.tokens.deleteAllRefreshTokens(userId);
+    //   throw new ForbiddenException('Your account has been banned');
+    // }
+
+    const accessToken = this.generateAccessToken(user);
+
+    return {
+      response: {
+        accessToken,
+        user: { id: user.id, email: user.email, role: user.role },
+      },
+      newRefreshToken: newRawToken,
     };
   }
 }

@@ -9,7 +9,7 @@ datasource db {
 
 enum UserStatus {
   PENDING 
-  ACTIVE  
+  ACTIVE
 }
 
 enum UserRole {
