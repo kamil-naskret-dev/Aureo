@@ -12,6 +12,7 @@ import { TokenService } from './infrastructure/token/token.service';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { LogoutResponseDto } from './dto/logout-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { isUniqueConstraintError } from '../prisma/utils/prisma-error.util';
@@ -97,6 +98,14 @@ export class AuthService {
       },
       refreshToken,
     };
+  }
+
+  async logout(rawToken: string | undefined): Promise<LogoutResponseDto> {
+    if (rawToken) {
+      await this.tokens.deleteByRawToken(rawToken);
+    }
+
+    return { success: true, message: 'Logged out successfully.' };
   }
 
   async refresh(

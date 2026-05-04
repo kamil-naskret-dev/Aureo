@@ -23,6 +23,7 @@ import { SWAGGER_TAGS } from '../common/constants/swagger.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { LogoutResponseDto } from './dto/logout-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { RequestMeta } from '../common/decorators/request-meta.decorator';
@@ -68,6 +69,23 @@ export class AuthController {
     this.cookieService.setRefreshToken(res, refreshToken);
 
     return response;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout and revoke refresh token' })
+  @ApiOkResponse({ type: LogoutResponseDto })
+  async logout(
+    @Req() req: Express.Request,
+    @Res({ passthrough: true }) res: Express.Response,
+  ): Promise<LogoutResponseDto> {
+    const refreshToken = this.cookieService.getRefreshToken(req);
+
+    const result = await this.authService.logout(refreshToken);
+
+    this.cookieService.clearRefreshToken(res);
+
+    return result;
   }
 
   @Post('refresh')
