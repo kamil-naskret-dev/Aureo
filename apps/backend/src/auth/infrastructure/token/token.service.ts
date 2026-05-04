@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Token, TokenType } from '@prisma/client';
 import * as crypto from 'crypto';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 export const REFRESH_TOKEN_TTL_DAYS = 30;
 export const REFRESH_TOKEN_TTL_MS =
@@ -40,7 +40,7 @@ export class TokenService {
   async rotateRefreshToken(
     rawToken: string,
     meta: { userAgent?: string; ipAddress?: string },
-  ): Promise<string> {
+  ): Promise<{ rawToken: string; userId: string }> {
     const existing = await this.findByRawToken(rawToken);
 
     if (!existing || existing.expiresAt < new Date()) {
@@ -49,11 +49,13 @@ export class TokenService {
 
     await this.prisma.token.delete({ where: { id: existing.id } });
 
-    return this.createRefreshToken({
+    const newRawToken = await this.createRefreshToken({
       userId: existing.userId,
       userAgent: meta.userAgent,
       ipAddress: meta.ipAddress,
     });
+
+    return { rawToken: newRawToken, userId: existing.userId };
   }
 
   async findActiveRefreshTokens(userId: string): Promise<Token[]> {

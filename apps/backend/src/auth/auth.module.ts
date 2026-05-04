@@ -3,10 +3,11 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 import { jwtConfig } from '../config/jwt.config';
-import { TokenModule } from '../token/token.module';
+import { TokenModule } from './infrastructure/token/token.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { CookieModule } from './infrastructure/cookie/cookie.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthService } from './auth.service';
         signOptions: { expiresIn: config.expiresIn },
       }),
     }),
+    CookieModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
