@@ -11,7 +11,11 @@
       "type": "application",
       "root": "apps/backend",
       "entryFile": "main",
-      "sourceRoot": "apps/backend/src"
+      "sourceRoot": "apps/backend/src",
+      "compilerOptions": {
+        "assets": ["mail/templates/**/*.hbs"],
+        "watchAssets": true
+      }
     }
   }
 }

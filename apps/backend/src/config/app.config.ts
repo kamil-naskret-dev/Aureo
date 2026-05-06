@@ -5,6 +5,7 @@ export interface AppConfig {
   nodeEnv: string;
   apiPrefix: string;
   corsOrigins: string[];
+  frontendUrl: string;
 }
 
 export default registerAs(
@@ -16,5 +17,6 @@ export default registerAs(
     corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
       .split(',')
       .map((o) => o.trim()),
+    frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:5173',
   }),
 );
