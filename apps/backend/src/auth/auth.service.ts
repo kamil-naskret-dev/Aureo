@@ -4,17 +4,23 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { TokenService } from './infrastructure/token/token.service';
+import { AppConfig } from '../config/app.config';
 import { UsersService } from '../users/users.service';
+import { MailService } from '../mail/mail.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { ResendVerificationResponseDto } from './dto/resend-verification-response.dto';
+import { VerifyEmailResponseDto } from './dto/verify-email-response.dto';
 import { isUniqueConstraintError } from '../prisma/utils/prisma-error.util';
 import { PASSWORD_SALT_ROUNDS } from './auth.constants';
 import { RequestMetaType } from '../common/types/request-meta.type';
@@ -25,6 +31,8 @@ export class AuthService {
     private readonly users: UsersService,
     private readonly tokens: TokenService,
     private readonly jwt: JwtService,
+    private readonly mail: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   private generateAccessToken(user: {
@@ -40,17 +48,26 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<RegisterResponseDto> {
+    const { frontendUrl }: AppConfig = this.config.getOrThrow<AppConfig>('app');
+
     const hashedPassword = await bcrypt.hash(
       dto.password,
       PASSWORD_SALT_ROUNDS,
     );
 
     try {
-      await this.users.create({
+      const user = await this.users.create({
         email: dto.email,
         password: hashedPassword,
         name: dto.name,
       });
+
+      const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
+
+      await this.mail.sendVerificationEmail(
+        user.email,
+        `${frontendUrl}/verify-email?token=${verifyToken}`,
+      );
 
       return {
         success: true,
@@ -62,6 +79,33 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async resendVerificationEmail(
+    dto: ResendVerificationDto,
+  ): Promise<ResendVerificationResponseDto> {
+    const { frontendUrl }: AppConfig = this.config.getOrThrow<AppConfig>('app');
+
+    const user = await this.users.findByEmail(dto.email);
+
+    if (user && user.status === UserStatus.PENDING) {
+      const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
+
+      await this.mail.sendVerificationEmail(
+        user.email,
+        `${frontendUrl}/verify-email?token=${verifyToken}`,
+      );
+    }
+
+    return { success: true, message: 'Verification email sent.' };
+  }
+
+  async verifyEmail(rawToken: string): Promise<VerifyEmailResponseDto> {
+    const userId = await this.tokens.consumeEmailVerifyToken(rawToken);
+
+    await this.users.activateUser(userId);
+
+    return { success: true, message: 'Email verified successfully.' };
   }
 
   async login(
