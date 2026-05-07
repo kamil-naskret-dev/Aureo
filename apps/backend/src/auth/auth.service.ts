@@ -13,14 +13,18 @@ import { TokenService } from './infrastructure/token/token.service';
 import { AppConfig } from '../config/app.config';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../mail/mail.service';
-import { LoginDto } from './dto/login.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LogoutResponseDto } from './dto/logout-response.dto';
-import { RegisterDto } from './dto/register.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
-import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { ResendVerificationResponseDto } from './dto/resend-verification-response.dto';
-import { VerifyEmailResponseDto } from './dto/verify-email-response.dto';
+import { LoginDto } from './dto/login/login.dto';
+import { LoginResponseDto } from './dto/login/login-response.dto';
+import { LogoutResponseDto } from './dto/logout/logout-response.dto';
+import { RegisterDto } from './dto/register/register.dto';
+import { RegisterResponseDto } from './dto/register/register-response.dto';
+import { ForgotPasswordDto } from './dto/forgot-password/forgot-password.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password/forgot-password-response.dto';
+import { ResendVerificationDto } from './dto/resend-verification/resend-verification.dto';
+import { ResendVerificationResponseDto } from './dto/resend-verification/resend-verification-response.dto';
+import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
+import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
 import { isUniqueConstraintError } from '../prisma/utils/prisma-error.util';
 import { PASSWORD_SALT_ROUNDS } from './auth.constants';
 import { RequestMetaType } from '../common/types/request-meta.type';
@@ -79,6 +83,44 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async forgotPassword(
+    dto: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
+    const { frontendUrl }: AppConfig = this.config.getOrThrow<AppConfig>('app');
+
+    const user = await this.users.findByEmail(dto.email);
+
+    if (user && user.status === UserStatus.ACTIVE) {
+      const resetToken = await this.tokens.createPasswordResetToken(user.id);
+
+      await this.mail.sendPasswordResetEmail(
+        user.email,
+        `${frontendUrl}/reset-password?token=${resetToken}`,
+      );
+    }
+
+    return {
+      success: true,
+      message: 'If the email exists, a reset link has been sent.',
+    };
+  }
+
+  async resetPassword(
+    dto: ResetPasswordDto,
+  ): Promise<ResetPasswordResponseDto> {
+    const userId = await this.tokens.consumePasswordResetToken(dto.token);
+
+    const hashedPassword = await bcrypt.hash(
+      dto.password,
+      PASSWORD_SALT_ROUNDS,
+    );
+
+    await this.users.updatePassword(userId, hashedPassword);
+    await this.tokens.deleteAllRefreshTokens(userId);
+
+    return { success: true, message: 'Password reset successfully.' };
   }
 
   async resendVerificationEmail(

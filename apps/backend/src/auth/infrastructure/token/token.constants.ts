@@ -1,0 +1,5 @@
+const MS_PER_HOUR = 60 * 60 * 1000;
+
+export const REFRESH_TOKEN_TTL_MS = 30 * 24 * MS_PER_HOUR;
+export const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * MS_PER_HOUR;
+export const PASSWORD_RESET_TOKEN_TTL_MS = 1 * MS_PER_HOUR;
