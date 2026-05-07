@@ -8,6 +8,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { JwtAuthGuard } from './auth/infrastructure/jwt/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import appConfig, { AppConfig } from './config/app.config';
 import { validate } from './config/config.validation';
@@ -70,6 +72,7 @@ import { PrismaModule } from './prisma/prisma.module';
     HealthModule,
     AuthModule,
     MailModule,
+    UsersModule,
   ],
   providers: [
     {
@@ -79,6 +82,10 @@ import { PrismaModule } from './prisma/prisma.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserStatus } from '@prisma/client';
+import { Prisma, User, UserStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserInputDto } from './dto/create-user.dto';
@@ -10,6 +10,15 @@ export class UsersService {
 
   async findById(id: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  async findByIdWithProfile(
+    id: string,
+  ): Promise<Prisma.UserGetPayload<{ include: { profile: true } }> | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: { profile: true },
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {

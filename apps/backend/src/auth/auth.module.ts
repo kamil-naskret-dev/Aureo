@@ -27,5 +27,6 @@ import { CookieModule } from './infrastructure/cookie/cookie.module';
   ],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [JwtModule],
 })
 export class AuthModule {}
