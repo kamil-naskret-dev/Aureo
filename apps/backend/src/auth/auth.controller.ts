@@ -37,10 +37,12 @@ import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
 import { VerifyEmailQueryDto } from './dto/verify-email/verify-email-query.dto';
 import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
+import { Public } from '../common/decorators/public.decorator';
 import { RequestMeta } from '../common/decorators/request-meta.decorator';
 import { type RequestMetaType } from '../common/types/request-meta.type';
 import { CookieService } from './infrastructure/cookie/cookie.service';
 
+@Public()
 @ApiTags(SWAGGER_TAGS.AUTH)
 @Controller('auth')
 export class AuthController {
