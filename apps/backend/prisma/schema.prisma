@@ -67,6 +67,7 @@ model Token {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, type])
+  @@index([expiresAt])
 }
 
 model Ban {
