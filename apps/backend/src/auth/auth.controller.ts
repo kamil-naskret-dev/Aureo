@@ -24,15 +24,19 @@ import * as Express from 'express';
 
 import { SWAGGER_TAGS } from '../common/constants/swagger.constants';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LogoutResponseDto } from './dto/logout-response.dto';
-import { RegisterDto } from './dto/register.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
-import { ResendVerificationDto } from './dto/resend-verification.dto';
-import { ResendVerificationResponseDto } from './dto/resend-verification-response.dto';
-import { VerifyEmailQueryDto } from './dto/verify-email-query.dto';
-import { VerifyEmailResponseDto } from './dto/verify-email-response.dto';
+import { LoginDto } from './dto/login/login.dto';
+import { LoginResponseDto } from './dto/login/login-response.dto';
+import { LogoutResponseDto } from './dto/logout/logout-response.dto';
+import { RegisterDto } from './dto/register/register.dto';
+import { RegisterResponseDto } from './dto/register/register-response.dto';
+import { ForgotPasswordDto } from './dto/forgot-password/forgot-password.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password/forgot-password-response.dto';
+import { ResendVerificationDto } from './dto/resend-verification/resend-verification.dto';
+import { ResendVerificationResponseDto } from './dto/resend-verification/resend-verification-response.dto';
+import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
+import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
+import { VerifyEmailQueryDto } from './dto/verify-email/verify-email-query.dto';
+import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
 import { RequestMeta } from '../common/decorators/request-meta.decorator';
 import { type RequestMetaType } from '../common/types/request-meta.type';
 import { CookieService } from './infrastructure/cookie/cookie.service';
@@ -58,6 +62,27 @@ export class AuthController {
   })
   async register(@Body() dto: RegisterDto): Promise<RegisterResponseDto> {
     return this.authService.register(dto);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request a password reset link' })
+  @ApiOkResponse({ type: ForgotPasswordResponseDto })
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using token from email link' })
+  @ApiOkResponse({ type: ResetPasswordResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid or expired reset token.' })
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<ResetPasswordResponseDto> {
+    return this.authService.resetPassword(dto);
   }
 
   @Post('resend-verification')

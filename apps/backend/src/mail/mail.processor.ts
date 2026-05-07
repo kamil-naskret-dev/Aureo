@@ -4,7 +4,11 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Job } from 'bullmq';
 
 import { MAIL_JOBS, MAIL_QUEUE, MailJobName } from './mail.constants';
-import { MailJobDataMap, VerifyEmailJobData } from './mail.types';
+import {
+  MailJobDataMap,
+  ResetPasswordJobData,
+  VerifyEmailJobData,
+} from './mail.types';
 
 @Processor(MAIL_QUEUE, { concurrency: 5 })
 export class MailProcessor extends WorkerHost {
@@ -19,7 +23,10 @@ export class MailProcessor extends WorkerHost {
   ): Promise<void> {
     switch (job.name) {
       case MAIL_JOBS.VERIFY_EMAIL:
-        await this.handleVerifyEmail(job.data);
+        await this.handleVerifyEmail(job.data as VerifyEmailJobData);
+        break;
+      case MAIL_JOBS.RESET_PASSWORD:
+        await this.handleResetPassword(job.data as ResetPasswordJobData);
         break;
       default: {
         this.logger.warn(`Unknown mail job`);
@@ -33,6 +40,22 @@ export class MailProcessor extends WorkerHost {
       `Mail job failed permanently: ${job?.name ?? 'unknown'} (id: ${job?.id ?? 'unknown'}) after ${job?.attemptsMade ?? '?'} attempts — ${error.message}`,
       error.stack,
     );
+  }
+
+  private async handleResetPassword(data: ResetPasswordJobData): Promise<void> {
+    this.logger.log(`Sending password reset email to ${data.to}`);
+
+    await this.mailer.sendMail({
+      to: data.to,
+      subject: 'Reset your Aureo password',
+      template: 'reset-password/reset-password',
+      context: {
+        resetUrl: data.resetUrl,
+        year: new Date().getFullYear(),
+      },
+    });
+
+    this.logger.log(`Password reset email sent to ${data.to}`);
   }
 
   private async handleVerifyEmail(data: VerifyEmailJobData): Promise<void> {

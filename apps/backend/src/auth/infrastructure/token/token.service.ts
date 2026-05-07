@@ -7,12 +7,11 @@ import { Token, TokenType } from '@prisma/client';
 import * as crypto from 'crypto';
 
 import { PrismaService } from '../../../prisma/prisma.service';
-
-export const REFRESH_TOKEN_TTL_DAYS = 30;
-export const REFRESH_TOKEN_TTL_MS =
-  REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
-export const EMAIL_VERIFY_TOKEN_TTL_HOURS = 24;
-const EMAIL_VERIFY_TOKEN_TTL_MS = EMAIL_VERIFY_TOKEN_TTL_HOURS * 60 * 60 * 1000;
+import {
+  EMAIL_VERIFY_TOKEN_TTL_MS,
+  PASSWORD_RESET_TOKEN_TTL_MS,
+  REFRESH_TOKEN_TTL_MS,
+} from './token.constants';
 
 @Injectable()
 export class TokenService {
@@ -41,51 +40,35 @@ export class TokenService {
   }
 
   async createEmailVerifyToken(userId: string): Promise<string> {
-    const raw = crypto.randomBytes(40).toString('hex');
-    const hashed = this.hash(raw);
+    return this.createSingleUseToken(
+      userId,
+      TokenType.EMAIL_VERIFY,
+      EMAIL_VERIFY_TOKEN_TTL_MS,
+    );
+  }
 
-    await this.prisma.$transaction(async (tx) => {
-      await tx.token.deleteMany({
-        where: { userId, type: TokenType.EMAIL_VERIFY },
-      });
-
-      await tx.token.create({
-        data: {
-          userId,
-          type: TokenType.EMAIL_VERIFY,
-          token: hashed,
-          expiresAt: new Date(Date.now() + EMAIL_VERIFY_TOKEN_TTL_MS),
-        },
-      });
-    });
-
-    return raw;
+  async createPasswordResetToken(userId: string): Promise<string> {
+    return this.createSingleUseToken(
+      userId,
+      TokenType.PASSWORD_RESET,
+      PASSWORD_RESET_TOKEN_TTL_MS,
+    );
   }
 
   async consumeEmailVerifyToken(rawToken: string): Promise<string> {
-    const hashed = this.hash(rawToken);
+    return this.consumeSingleUseToken(
+      rawToken,
+      TokenType.EMAIL_VERIFY,
+      'Invalid or expired verification token',
+    );
+  }
 
-    const token = await this.prisma.token.findUnique({
-      where: { token: hashed },
-    });
-
-    if (
-      !token ||
-      token.type !== TokenType.EMAIL_VERIFY ||
-      token.expiresAt < new Date()
-    ) {
-      throw new BadRequestException('Invalid or expired verification token');
-    }
-
-    const { count } = await this.prisma.token.deleteMany({
-      where: { id: token.id },
-    });
-
-    if (count === 0) {
-      throw new BadRequestException('Invalid or expired verification token');
-    }
-
-    return token.userId;
+  async consumePasswordResetToken(rawToken: string): Promise<string> {
+    return this.consumeSingleUseToken(
+      rawToken,
+      TokenType.PASSWORD_RESET,
+      'Invalid or expired password reset token',
+    );
   }
 
   async rotateRefreshToken(
@@ -136,6 +119,55 @@ export class TokenService {
     await this.prisma.token.deleteMany({
       where: { userId, type: TokenType.REFRESH },
     });
+  }
+
+  private async createSingleUseToken(
+    userId: string,
+    type: TokenType,
+    ttlMs: number,
+  ): Promise<string> {
+    const raw = crypto.randomBytes(40).toString('hex');
+    const hashed = this.hash(raw);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.token.deleteMany({ where: { userId, type } });
+      await tx.token.create({
+        data: {
+          userId,
+          type,
+          token: hashed,
+          expiresAt: new Date(Date.now() + ttlMs),
+        },
+      });
+    });
+
+    return raw;
+  }
+
+  private async consumeSingleUseToken(
+    rawToken: string,
+    type: TokenType,
+    errorMessage: string,
+  ): Promise<string> {
+    const hashed = this.hash(rawToken);
+
+    const token = await this.prisma.token.findUnique({
+      where: { token: hashed },
+    });
+
+    if (!token || token.type !== type || token.expiresAt < new Date()) {
+      throw new BadRequestException(errorMessage);
+    }
+
+    const { count } = await this.prisma.token.deleteMany({
+      where: { id: token.id },
+    });
+
+    if (count === 0) {
+      throw new BadRequestException(errorMessage);
+    }
+
+    return token.userId;
   }
 
   private async findByRawToken(rawToken: string): Promise<Token | null> {

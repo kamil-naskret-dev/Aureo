@@ -3,7 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 
 import { MAIL_JOBS, MAIL_QUEUE, MailJobName } from './mail.constants';
-import { MailJobDataMap, VerifyEmailJobData } from './mail.types';
+import {
+  MailJobDataMap,
+  ResetPasswordJobData,
+  VerifyEmailJobData,
+} from './mail.types';
 
 @Injectable()
 export class MailService {
@@ -24,5 +28,12 @@ export class MailService {
       to,
       verificationUrl,
     } satisfies VerifyEmailJobData);
+  }
+
+  async sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
+    await this.mailQueue.add(MAIL_JOBS.RESET_PASSWORD, {
+      to,
+      resetUrl,
+    } satisfies ResetPasswordJobData);
   }
 }

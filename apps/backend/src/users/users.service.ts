@@ -23,6 +23,13 @@ export class UsersService {
     });
   }
 
+  async updatePassword(id: string, hashedPassword: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
+  }
+
   async create(data: CreateUserInputDto): Promise<User> {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
