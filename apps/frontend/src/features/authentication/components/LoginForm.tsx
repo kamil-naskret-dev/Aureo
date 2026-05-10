@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Field, FieldError, FieldGroup, FieldLabel, Input, Spinner } from '@aureo/ui';
+import { useNavigate } from '@tanstack/react-router';
 import { AlertCircle } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
+
+import { useLogin } from '../hooks/useLogin';
 import { LoginFormValues, LoginSchema } from '../schemas/login-schema';
 
 export const LoginForm = () => {
+  const { mutateAsync: login } = useLogin();
+  const navigate = useNavigate();
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: '', password: '' },
@@ -15,7 +21,12 @@ export const LoginForm = () => {
   } = form;
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log(data);
+    try {
+      await login(data);
+      await navigate({ to: '/dashboard' });
+    } catch (err) {
+      form.setError('root', { message: (err as Error).message });
+    }
   };
 
   return (
@@ -37,7 +48,7 @@ export const LoginForm = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input {...field} id="email" aria-invalid={fieldState.invalid} autoComplete="off" />
+              <Input {...field} id="email" aria-invalid={fieldState.invalid} autoComplete="email" />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -51,8 +62,9 @@ export const LoginForm = () => {
               <Input
                 {...field}
                 id="password"
+                type="password"
                 aria-invalid={fieldState.invalid}
-                autoComplete="off"
+                autoComplete="current-password"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

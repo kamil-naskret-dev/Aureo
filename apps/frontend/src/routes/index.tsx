@@ -1,9 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@aureo/ui';
 import Logo from './../assets/icons/logo.svg?react';
 import { LoginActions, LoginForm } from '../features/authentication';
+import { useAuthStore } from '../store/auth.store';
 
 export const Route = createFileRoute('/')({
+  beforeLoad: async () => {
+    if (useAuthStore.getState().isAuthenticated) {
+      throw redirect({ to: '/dashboard' });
+    }
+  },
   component: LoginPage,
 });
 
