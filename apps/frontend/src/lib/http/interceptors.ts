@@ -24,7 +24,9 @@ export const setupHttpInterceptors = () => {
     async (error) => {
       if (!error.response) {
         return Promise.reject(
-          new ApiError(0, 'Network Error', ['Something went wrong. Please try again.']),
+          new ApiError(0, 'Network Error', [
+            'Unable to connect to the server. Check your internet connection.',
+          ]),
         );
       }
 

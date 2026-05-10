@@ -13,5 +13,13 @@ export const Route = createFileRoute('/_authenticated')({
       throw redirect({ to: '/' });
     }
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 });
+
+function AuthenticatedLayout() {
+  const user = useAuthStore((s) => s.user);
+
+  if (!user) return null;
+
+  return <Outlet />;
+}

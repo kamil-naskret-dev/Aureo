@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@aureo/ui';
 
+import { useLogout } from '../../features/authentication/hooks/useLogout';
 import { useUser } from '../../store/auth.store';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
@@ -8,6 +10,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 
 function DashboardPage() {
   const user = useUser();
+  const { mutate: logout, isPending } = useLogout();
 
   return (
     <div className="flex min-h-screen items-start justify-center bg-custom-background px-4 pt-16">
@@ -19,6 +22,15 @@ function DashboardPage() {
           {user.email}
         </p>
         <p className="text-sm text-custom-neutral-500">{user.role}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isPending}
+          onClick={() => logout()}
+          className="mt-4 w-full"
+        >
+          {isPending ? 'Logging out...' : 'Log out'}
+        </Button>
       </div>
     </div>
   );
