@@ -12,7 +12,7 @@ export const LoginActions = () => {
         {
           label: "Don't have an account?",
           linkText: 'Sign up',
-          to: '/sign-up',
+          to: '/register',
         },
       ]}
     />
