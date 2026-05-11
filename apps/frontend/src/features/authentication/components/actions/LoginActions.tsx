@@ -7,7 +7,7 @@ export const LoginActions = () => {
         {
           label: 'Forgot password?',
           linkText: 'Reset it',
-          to: '/reset-password',
+          to: '/forgot-password',
         },
         {
           label: "Don't have an account?",
