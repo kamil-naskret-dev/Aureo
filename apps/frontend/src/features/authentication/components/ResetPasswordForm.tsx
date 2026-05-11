@@ -1,40 +1,34 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Field, FieldError, FieldGroup, FieldLabel, Input, Spinner } from '@aureo/ui';
-import { useNavigate } from '@tanstack/react-router';
 import { AlertCircle } from 'lucide-react';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { ApiError } from '../../../lib/http/api-error';
-import { useLogin } from '../hooks/useLogin';
-import { LoginFormValues, LoginSchema } from '../schemas/login-schema';
-import { UnverifiedEmailAlert } from './UnverifiedEmailAlert';
+import { useResetPassword } from '../hooks/useResetPassword';
+import { ResetPasswordFormValues, ResetPasswordSchema } from '../schemas/reset-password-schema';
 
-export const LoginForm = () => {
-  const { mutateAsync: login } = useLogin();
-  const navigate = useNavigate();
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+type ResetPasswordFormProps = {
+  token: string;
+  onSuccess: () => void;
+};
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: { email: '', password: '' },
+export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) => {
+  const { mutateAsync: resetPassword } = useResetPassword();
+
+  const form = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(ResetPasswordSchema),
+    defaultValues: { password: '', confirmPassword: '' },
   });
 
   const {
     formState: { errors, isSubmitting },
   } = form;
 
-  const onSubmit = async (data: LoginFormValues) => {
-    setUnverifiedEmail(null);
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     try {
-      await login(data);
-      await navigate({ to: '/dashboard' });
+      await resetPassword({ token, password: data.password });
+      onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.statusCode === 403) {
-        setUnverifiedEmail(data.email);
-      } else {
-        form.setError('root', { message: (err as Error).message });
-      }
+      form.setError('root', { message: (err as Error).message });
     }
   };
 
@@ -50,32 +44,36 @@ export const LoginForm = () => {
         </div>
       )}
 
-      {unverifiedEmail && <UnverifiedEmailAlert email={unverifiedEmail} />}
-
       <FieldGroup>
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input {...field} id="email" aria-invalid={fieldState.invalid} autoComplete="email" />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
         <Controller
           name="password"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password">New password</FieldLabel>
               <Input
                 {...field}
                 id="password"
                 type="password"
                 aria-invalid={fieldState.invalid}
-                autoComplete="current-password"
+                autoComplete="new-password"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="confirmPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="confirmPassword">Confirm new password</FieldLabel>
+              <Input
+                {...field}
+                id="confirmPassword"
+                type="password"
+                aria-invalid={fieldState.invalid}
+                autoComplete="new-password"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -84,7 +82,7 @@ export const LoginForm = () => {
       </FieldGroup>
       <Button type="submit" size="lg" disabled={isSubmitting}>
         {isSubmitting && <Spinner />}
-        {isSubmitting ? 'Logging in...' : 'Log in'}
+        {isSubmitting ? 'Resetting...' : 'Reset password'}
       </Button>
     </form>
   );
