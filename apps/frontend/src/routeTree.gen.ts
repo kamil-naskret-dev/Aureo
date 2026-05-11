@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as SplatRouteImport } from './routes/$splat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$splat': typeof SplatRoute
   '/register': typeof RegisterRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$splat': typeof SplatRoute
   '/register': typeof RegisterRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/$splat': typeof SplatRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/register': typeof RegisterRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$splat' | '/register' | '/dashboard'
+  fullPaths: '/' | '/$splat' | '/register' | '/verify-email' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$splat' | '/register' | '/dashboard'
+  to: '/' | '/$splat' | '/register' | '/verify-email' | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/$splat'
     | '/_authenticated'
     | '/register'
+    | '/verify-email'
     | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -79,10 +89,18 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -138,6 +156,7 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
