@@ -6,3 +6,8 @@ export * from './components/ui/label';
 export * from './components/ui/separator';
 export * from './components/ui/field';
 export * from './components/ui/spinner';
+export * from './components/ui/dialog';
+export * from './components/ui/dropdown-menu';
+export * from './components/ui/select';
+export * from './components/ui/sheet';
+export * from './components/ui/checkbox';
