@@ -1,6 +1,6 @@
-import { Checkbox, cn, Separator } from '@aureo/ui';
+import { Checkbox, cn } from '@aureo/ui';
 import { Link, useLocation } from '@tanstack/react-router';
-import { Archive, Home, Tag } from 'lucide-react';
+import { Archive, Home } from 'lucide-react';
 
 import Logo from '../../../assets/icons/logo.svg?react';
 import { useDashboard } from '../context/DashboardContext';
@@ -22,56 +22,58 @@ export const Sidebar = ({ className }: SidebarProps) => {
   return (
     <aside
       className={cn(
-        'flex w-[296px] shrink-0 flex-col border-r border-custom-neutral-200 bg-white dark:border-custom-neutral-700 dark:bg-custom-neutral-900',
+        'flex w-full max-w-74 gap-4 shrink-0 flex-col border-r border-custom-neutral-300 bg-white dark:border-custom-neutral-700 dark:bg-custom-neutral-900',
         className,
       )}
     >
-      <div className="px-6 py-5">
+      <div className="pt-5 px-5 pb-2.5">
         <Logo />
       </div>
 
-      <nav className="flex flex-col gap-1 px-4 pb-4">
+      <nav className="flex flex-col px-4">
         {NAV_LINKS.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-              pathname === to
-                ? 'bg-custom-neutral-100 text-custom-neutral-900 dark:bg-custom-neutral-800 dark:text-white'
-                : 'text-custom-neutral-600 hover:bg-custom-neutral-100 hover:text-custom-neutral-900 dark:text-custom-neutral-400 dark:hover:bg-custom-neutral-800 dark:hover:text-white',
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            {label}
-          </Link>
+          <div key={to} className="py-0.5">
+            <Link
+              to={to}
+              className={cn(
+                'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700  focus-visible:ring-offset-2',
+                pathname === to
+                  ? 'bg-custom-neutral-100 border-custom-neutral-100 text-custom-neutral-900'
+                  : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900',
+              )}
+            >
+              <Icon className="size-5 shrink-0" />
+              {label}
+            </Link>
+          </div>
         ))}
       </nav>
 
-      <Separator />
-
-      <div className="flex flex-col gap-2 p-4">
-        <div className="flex items-center gap-2 px-3 py-1">
-          <Tag className="size-3.5 shrink-0 text-custom-neutral-400" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-custom-neutral-400">
+      <div className="flex flex-col gap-2 px-4 pb-5">
+        <div className="pb-1 px-3 border-b border-transparent">
+          <span className="text-xs font-bold uppercase text-custom-secondary-400 leading-[140%]">
             Tags
           </span>
         </div>
-        <div className="flex flex-col gap-0.5">
+
+        <div className="flex flex-col">
           {DUMMY_TAGS.map((tag) => (
-            <label
-              key={tag.id}
-              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-custom-neutral-100 dark:hover:bg-custom-neutral-800"
-            >
-              <Checkbox
-                checked={activeTags.has(tag.name)}
-                onCheckedChange={() => toggleTag(tag.name)}
-              />
-              <span className="flex-1 text-sm text-custom-neutral-700 dark:text-custom-neutral-300">
-                {tag.name}
-              </span>
-              <span className="text-xs tabular-nums text-custom-neutral-400">{tag.count}</span>
-            </label>
+            <div key={tag.id} className="py-0.5">
+              <label className="flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors">
+                <Checkbox
+                  checked={activeTags.has(tag.name)}
+                  onCheckedChange={() => toggleTag(tag.name)}
+                />
+                <span className="flex-1 font-semibold text-custom-neutral-800 leading-[140%]">
+                  {tag.name}
+                </span>
+                <div className="border border-custom-neutral-300 rounded-full bg-custom-neutral-100 py-0.5 px-2 flex items-center">
+                  <span className="text-xs font-medium leading-[140%] text-custom-neutral-800">
+                    {tag.count}
+                  </span>
+                </div>
+              </label>
+            </div>
           ))}
         </div>
       </div>
