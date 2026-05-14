@@ -6,12 +6,15 @@
 
 :root {
   --custom-background: oklch(94.883% 0.00863 188.819);
+  --custom-primary-600: oklch(43.514% 0.06228 192.13);
   --custom-primary-700: oklch(35.966% 0.0614 191.588);
   --custom-primary-800: oklch(32.232% 0.05469 192.961);
   --custom-neutral-100: oklch(94.883% 0.00863 188.819);
+  --custom-neutral-300: oklch(92.443% 0.01308 185.537);
   --custom-neutral-500: oklch(65.701% 0.01305 184.206);
   --custom-neutral-800: oklch(46.024% 0.02032 182.942);
   --custom-neutral-900: oklch(18.04% 0.02318 185.233);
+  --custom-secondary-400: oklch(42.024% 0.00005 271.152);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -89,6 +92,7 @@
 @theme inline {
   --font-sans: 'Manrope Variable', sans-serif;
   --color-custom-background: var(--custom-background);
+  --color-custom-primary-600: var(--custom-primary-600);
   --color-custom-primary-700: var(--custom-primary-700);
   --color-custom-primary-800: var(--custom-primary-800);
   --color-custom-neutral-100: var(--custom-neutral-100);
@@ -97,6 +101,7 @@
   --color-custom-neutral-600: var(--custom-neutral-600);
   --color-custom-neutral-800: var(--custom-neutral-800);
   --color-custom-neutral-900: var(--custom-neutral-900);
+  --color-custom-secondary-400: var(--custom-secondary-400);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

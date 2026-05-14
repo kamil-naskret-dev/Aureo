@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as SplatRouteImport } from './routes/$splat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDashboardArchivedRouteImport } from './routes/_authenticated/dashboard.archived'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -57,6 +58,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDashboardArchivedRoute =
+  AuthenticatedDashboardArchivedRouteImport.update({
+    id: '/archived',
+    path: '/archived',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,7 +72,8 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/dashboard/archived': typeof AuthenticatedDashboardArchivedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,7 +82,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/dashboard/archived': typeof AuthenticatedDashboardArchivedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,7 +94,8 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/_authenticated/dashboard/archived': typeof AuthenticatedDashboardArchivedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard'
+    | '/dashboard/archived'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard'
+    | '/dashboard/archived'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dashboard/archived'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,15 +199,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/archived': {
+      id: '/_authenticated/dashboard/archived'
+      path: '/archived'
+      fullPath: '/dashboard/archived'
+      preLoaderRoute: typeof AuthenticatedDashboardArchivedRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
+interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardArchivedRoute: typeof AuthenticatedDashboardArchivedRoute
+}
+
+const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
+  {
+    AuthenticatedDashboardArchivedRoute: AuthenticatedDashboardArchivedRoute,
+  }
+
+const AuthenticatedDashboardRouteWithChildren =
+  AuthenticatedDashboardRoute._addFileChildren(
+    AuthenticatedDashboardRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
