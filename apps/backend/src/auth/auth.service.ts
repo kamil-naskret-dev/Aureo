@@ -154,7 +154,7 @@ export class AuthService {
     dto: LoginDto,
     meta: RequestMetaType,
   ): Promise<{ response: LoginResponseDto; refreshToken: string }> {
-    const user = await this.users.findByEmail(dto.email);
+    const user = await this.users.findByEmailWithProfile(dto.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -180,7 +180,13 @@ export class AuthService {
     return {
       response: {
         accessToken,
-        user: { id: user.id, email: user.email, role: user.role },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.profile!.name,
+          role: user.role,
+          image: user.profile?.avatarUrl ?? null,
+        },
       },
       refreshToken,
     };
@@ -205,7 +211,7 @@ export class AuthService {
     const { rawToken: newRawToken, userId } =
       await this.tokens.rotateRefreshToken(rawToken, meta);
 
-    const user = await this.users.findById(userId);
+    const user = await this.users.findByIdWithProfile(userId);
 
     if (!user) {
       throw new UnauthorizedException('Invalid or expired refresh token');
@@ -222,7 +228,13 @@ export class AuthService {
     return {
       response: {
         accessToken,
-        user: { id: user.id, email: user.email, role: user.role },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.profile!.name,
+          role: user.role,
+          image: user.profile?.avatarUrl ?? null,
+        },
       },
       newRefreshToken: newRawToken,
     };

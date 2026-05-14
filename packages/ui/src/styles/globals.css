@@ -6,6 +6,7 @@
 
 :root {
   --custom-background: oklch(94.883% 0.00863 188.819);
+  --custom-primary-600: oklch(43.514% 0.06228 192.13);
   --custom-primary-700: oklch(35.966% 0.0614 191.588);
   --custom-primary-800: oklch(32.232% 0.05469 192.961);
   --custom-neutral-100: oklch(94.883% 0.00863 188.819);
@@ -91,6 +92,7 @@
 @theme inline {
   --font-sans: 'Manrope Variable', sans-serif;
   --color-custom-background: var(--custom-background);
+  --color-custom-primary-600: var(--custom-primary-600);
   --color-custom-primary-700: var(--custom-primary-700);
   --color-custom-primary-800: var(--custom-primary-800);
   --color-custom-neutral-100: var(--custom-neutral-100);

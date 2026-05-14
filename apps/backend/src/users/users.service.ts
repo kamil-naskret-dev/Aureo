@@ -21,6 +21,15 @@ export class UsersService {
     });
   }
 
+  async findByEmailWithProfile(
+    email: string,
+  ): Promise<Prisma.UserGetPayload<{ include: { profile: true } }> | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: { profile: true },
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { email } });
   }

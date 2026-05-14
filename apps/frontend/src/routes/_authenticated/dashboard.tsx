@@ -26,7 +26,7 @@ function DashboardPage() {
         <Sidebar className="hidden lg:flex" />
 
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetContent side="left" className="w-74 p-0">
+          <SheetContent side="left" className="w-full max-w-74 p-0">
             <Sidebar className="flex h-full w-full border-r-0" />
           </SheetContent>
         </Sheet>

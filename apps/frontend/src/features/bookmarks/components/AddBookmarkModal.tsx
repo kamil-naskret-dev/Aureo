@@ -18,7 +18,7 @@ type AddBookmarkModalProps = {
 export const AddBookmarkModal = ({ open, onOpenChange }: AddBookmarkModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Bookmark</DialogTitle>
         </DialogHeader>

@@ -1,4 +1,4 @@
-import { Input } from '@aureo/ui';
+import { Button, Input } from '@aureo/ui';
 import { Menu, Plus, Search } from 'lucide-react';
 
 import { AuthUser } from '../../authentication/types/auth.types';
@@ -15,35 +15,32 @@ export const DashboardNav = ({ user, onMenuClick, onAddBookmark }: DashboardNavP
   const { searchQuery, setSearchQuery } = useDashboard();
 
   return (
-    <header className="flex items-center gap-3 border-b border-custom-neutral-200 bg-white px-6 py-3 dark:border-custom-neutral-700 dark:bg-custom-neutral-900">
-      <button
-        type="button"
+    <header className="flex items-center gap-3 border-b border-custom-neutral-300 bg-white py-3 px-4 sm:px-8 sm:py-4 ">
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={onMenuClick}
-        className="flex size-9 shrink-0 items-center justify-center rounded-lg text-custom-neutral-600 transition-colors hover:bg-custom-neutral-100 dark:text-custom-neutral-400 dark:hover:bg-custom-neutral-800 lg:hidden"
+        className="size-9 shrink-0 text-custom-neutral-600 lg:hidden dark:text-custom-neutral-400"
         aria-label="Open menu"
       >
         <Menu className="size-5" />
-      </button>
+      </Button>
 
-      <div className="relative w-full max-w-[320px]">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-custom-neutral-400" />
+      <div className="relative min-w-0 flex-1 max-w-[320px]">
+        <Search className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-custom-neutral-800" />
         <Input
           placeholder="Search by title..."
-          className="pl-9"
+          className="p-3 pl-10 font-medium text-sm leading-[150%] tracking-[1%] text-custom-neutral-800 border-custom-neutral-300 h-10 sm:h-11.25"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onAddBookmark}
-          className="flex shrink-0 items-center gap-2 rounded-lg bg-custom-primary-700 px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-        >
-          <Plus className="size-4" />
+      <div className="ml-auto flex shrink-0 items-center gap-2.5 sm:gap-4">
+        <Button size="cta" onClick={onAddBookmark} className="flex items-center gap-1">
+          <Plus className="size-5" />
           <span className="hidden sm:inline">Add Bookmark</span>
-        </button>
+        </Button>
         <UserDropdown user={user} />
       </div>
     </header>
