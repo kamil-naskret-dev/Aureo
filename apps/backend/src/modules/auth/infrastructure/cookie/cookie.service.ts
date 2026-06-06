@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import type { Response, Request } from 'express';
 
+import { REFRESH_TOKEN_TTL_MS } from '../token/token.constants';
+
 const REFRESH_TOKEN_COOKIE = 'refreshToken';
-const REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class CookieService {

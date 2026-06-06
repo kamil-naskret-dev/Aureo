@@ -19,28 +19,29 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 import * as Express from 'express';
 
 import { SWAGGER_TAGS } from '../../common/constants/swagger.constants';
+import { Public } from '../../common/decorators/public.decorator';
+import { RequestMeta } from '../../common/decorators/request-meta.decorator';
+import { type RequestMetaType } from '../../common/types/request-meta.type';
 import { AuthService } from './auth.service';
+import { CookieService } from './infrastructure/cookie/cookie.service';
+import { ForgotPasswordDto } from './dto/forgot-password/forgot-password.dto';
+import { ForgotPasswordResponseDto } from './dto/forgot-password/forgot-password-response.dto';
 import { LoginDto } from './dto/login/login.dto';
 import { LoginResponseDto } from './dto/login/login-response.dto';
 import { LogoutResponseDto } from './dto/logout/logout-response.dto';
 import { RegisterDto } from './dto/register/register.dto';
 import { RegisterResponseDto } from './dto/register/register-response.dto';
-import { ForgotPasswordDto } from './dto/forgot-password/forgot-password.dto';
-import { ForgotPasswordResponseDto } from './dto/forgot-password/forgot-password-response.dto';
 import { ResendVerificationDto } from './dto/resend-verification/resend-verification.dto';
 import { ResendVerificationResponseDto } from './dto/resend-verification/resend-verification-response.dto';
 import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
 import { VerifyEmailQueryDto } from './dto/verify-email/verify-email-query.dto';
 import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
-import { Public } from '../../common/decorators/public.decorator';
-import { RequestMeta } from '../../common/decorators/request-meta.decorator';
-import { type RequestMetaType } from '../../common/types/request-meta.type';
-import { CookieService } from './infrastructure/cookie/cookie.service';
 
 @Public()
 @ApiTags(SWAGGER_TAGS.AUTH)
@@ -53,6 +54,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
+  @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
   @ApiOperation({ summary: 'Register a new user account' })
   @ApiCreatedResponse({
     type: RegisterResponseDto,
@@ -66,52 +68,9 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
-  @Post('forgot-password')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Request a password reset link' })
-  @ApiOkResponse({ type: ForgotPasswordResponseDto })
-  async forgotPassword(
-    @Body() dto: ForgotPasswordDto,
-  ): Promise<ForgotPasswordResponseDto> {
-    return this.authService.forgotPassword(dto);
-  }
-
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Reset password using token from email link' })
-  @ApiOkResponse({ type: ResetPasswordResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid or expired reset token.' })
-  async resetPassword(
-    @Body() dto: ResetPasswordDto,
-  ): Promise<ResetPasswordResponseDto> {
-    return this.authService.resetPassword(dto);
-  }
-
-  @Post('resend-verification')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Resend email verification link' })
-  @ApiOkResponse({ type: ResendVerificationResponseDto })
-  async resendVerification(
-    @Body() dto: ResendVerificationDto,
-  ): Promise<ResendVerificationResponseDto> {
-    return this.authService.resendVerificationEmail(dto);
-  }
-
-  @Get('verify-email')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Verify email address using token from email link' })
-  @ApiOkResponse({ type: VerifyEmailResponseDto })
-  @ApiBadRequestResponse({
-    description: 'Invalid or expired verification token.',
-  })
-  async verifyEmail(
-    @Query() query: VerifyEmailQueryDto,
-  ): Promise<VerifyEmailResponseDto> {
-    return this.authService.verifyEmail(query.token);
-  }
-
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 900_000 } })
   @ApiOperation({ summary: 'Login and receive tokens' })
   @ApiOkResponse({ type: LoginResponseDto })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
@@ -147,6 +106,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Refresh access token using refresh token cookie' })
   @ApiOkResponse({ type: LoginResponseDto })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid refresh token.' })
@@ -166,5 +126,53 @@ export class AuthController {
     this.cookieService.setRefreshToken(res, newRefreshToken);
 
     return response;
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
+  @ApiOperation({ summary: 'Request a password reset link' })
+  @ApiOkResponse({ type: ForgotPasswordResponseDto })
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 900_000 } })
+  @ApiOperation({ summary: 'Reset password using token from email link' })
+  @ApiOkResponse({ type: ResetPasswordResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid or expired reset token.' })
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<ResetPasswordResponseDto> {
+    return this.authService.resetPassword(dto);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
+  @ApiOperation({ summary: 'Resend email verification link' })
+  @ApiOkResponse({ type: ResendVerificationResponseDto })
+  async resendVerification(
+    @Body() dto: ResendVerificationDto,
+  ): Promise<ResendVerificationResponseDto> {
+    return this.authService.resendVerificationEmail(dto);
+  }
+
+  @Get('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
+  @ApiOperation({ summary: 'Verify email address using token from email link' })
+  @ApiOkResponse({ type: VerifyEmailResponseDto })
+  @ApiBadRequestResponse({
+    description: 'Invalid or expired verification token.',
+  })
+  async verifyEmail(
+    @Query() query: VerifyEmailQueryDto,
+  ): Promise<VerifyEmailResponseDto> {
+    return this.authService.verifyEmail(query.token);
   }
 }

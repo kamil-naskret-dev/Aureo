@@ -7,6 +7,7 @@ import {
   InvalidPasswordResetTokenException,
   InvalidRefreshTokenException,
   InvalidVerificationTokenException,
+  RefreshTokenReuseException,
 } from '../../../../common/exceptions/token.exceptions';
 import {
   EMAIL_VERIFY_TOKEN_TTL_MS,
@@ -78,7 +79,16 @@ export class TokenService {
   ): Promise<{ rawToken: string; userId: string }> {
     const existing = await this.findByRawToken(rawToken);
 
-    if (!existing || existing.expiresAt < new Date()) {
+    if (!existing) {
+      throw new InvalidRefreshTokenException();
+    }
+
+    if (existing.usedAt !== null) {
+      await this.deleteAllRefreshTokens(existing.userId);
+      throw new RefreshTokenReuseException();
+    }
+
+    if (existing.expiresAt < new Date()) {
       throw new InvalidRefreshTokenException();
     }
 
@@ -86,7 +96,10 @@ export class TokenService {
     const newHashed = this.hash(newRaw);
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.token.delete({ where: { id: existing.id } });
+      await tx.token.update({
+        where: { id: existing.id },
+        data: { usedAt: new Date() },
+      });
 
       await tx.token.create({
         data: {
@@ -101,12 +114,6 @@ export class TokenService {
     });
 
     return { rawToken: newRaw, userId: existing.userId };
-  }
-
-  async findActiveRefreshTokens(userId: string): Promise<Token[]> {
-    return this.prisma.token.findMany({
-      where: { userId, type: TokenType.REFRESH, expiresAt: { gt: new Date() } },
-    });
   }
 
   async deleteByRawToken(rawToken: string): Promise<void> {
