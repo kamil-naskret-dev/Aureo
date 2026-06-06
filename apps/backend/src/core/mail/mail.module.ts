@@ -8,7 +8,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { MailConfig } from '../config/mail.config';
+import { MailConfig } from '../../config/mail.config';
 import { MAIL_QUEUE } from './mail.constants';
 import { MailProcessor } from './mail.processor';
 import { MailService } from './mail.service';
@@ -55,7 +55,7 @@ import { MailService } from './mail.service';
           template: {
             dir:
               process.env.NODE_ENV !== 'production'
-                ? join(process.cwd(), 'src', 'mail', 'templates')
+                ? join(process.cwd(), 'src', 'core', 'mail', 'templates')
                 : join(__dirname, 'templates'),
             adapter: new HandlebarsAdapter(),
             options: { strict: true },

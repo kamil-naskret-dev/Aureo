@@ -1,12 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Token, TokenType } from '@prisma/client';
 import * as crypto from 'crypto';
 
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../../../../core/prisma/prisma.service';
+import {
+  InvalidPasswordResetTokenException,
+  InvalidRefreshTokenException,
+  InvalidVerificationTokenException,
+} from '../../../../common/exceptions/token.exceptions';
 import {
   EMAIL_VERIFY_TOKEN_TTL_MS,
   PASSWORD_RESET_TOKEN_TTL_MS,
@@ -59,7 +60,7 @@ export class TokenService {
     return this.consumeSingleUseToken(
       rawToken,
       TokenType.EMAIL_VERIFY,
-      'Invalid or expired verification token',
+      new InvalidVerificationTokenException(),
     );
   }
 
@@ -67,7 +68,7 @@ export class TokenService {
     return this.consumeSingleUseToken(
       rawToken,
       TokenType.PASSWORD_RESET,
-      'Invalid or expired password reset token',
+      new InvalidPasswordResetTokenException(),
     );
   }
 
@@ -78,7 +79,7 @@ export class TokenService {
     const existing = await this.findByRawToken(rawToken);
 
     if (!existing || existing.expiresAt < new Date()) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new InvalidRefreshTokenException();
     }
 
     const newRaw = crypto.randomBytes(40).toString('hex');
@@ -147,7 +148,7 @@ export class TokenService {
   private async consumeSingleUseToken(
     rawToken: string,
     type: TokenType,
-    errorMessage: string,
+    error: Error,
   ): Promise<string> {
     const hashed = this.hash(rawToken);
 
@@ -156,16 +157,14 @@ export class TokenService {
     });
 
     if (!token || token.type !== type || token.expiresAt < new Date()) {
-      throw new BadRequestException(errorMessage);
+      throw error;
     }
 
     const { count } = await this.prisma.token.deleteMany({
       where: { id: token.id },
     });
 
-    if (count === 0) {
-      throw new BadRequestException(errorMessage);
-    }
+    if (count === 0) throw error;
 
     return token.userId;
   }

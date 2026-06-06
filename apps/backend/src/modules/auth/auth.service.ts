@@ -1,18 +1,22 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { TokenService } from './infrastructure/token/token.service';
-import { AppConfig } from '../config/app.config';
+import { AppConfig } from '../../config/app.config';
 import { UsersService } from '../users/users.service';
-import { MailService } from '../mail/mail.service';
+import { MailService } from '../../core/mail/mail.service';
+import {
+  EmailNotVerifiedException,
+  InvalidCredentialsException,
+} from '../../common/exceptions/auth.exceptions';
+import { UserAlreadyExistsException } from '../../common/exceptions/user.exceptions';
+import {
+  InvalidRefreshTokenException,
+  MissingRefreshTokenException,
+} from '../../common/exceptions/token.exceptions';
 import { LoginDto } from './dto/login/login.dto';
 import { LoginResponseDto } from './dto/login/login-response.dto';
 import { LogoutResponseDto } from './dto/logout/logout-response.dto';
@@ -25,9 +29,9 @@ import { ResendVerificationResponseDto } from './dto/resend-verification/resend-
 import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
 import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
-import { isUniqueConstraintError } from '../prisma/utils/prisma-error.util';
+import { isUniqueConstraintError } from '../../core/prisma/utils/prisma-error.util';
 import { PASSWORD_SALT_ROUNDS } from './auth.constants';
-import { RequestMetaType } from '../common/types/request-meta.type';
+import { RequestMetaType } from '../../common/types/request-meta.type';
 
 @Injectable()
 export class AuthService {
@@ -44,11 +48,7 @@ export class AuthService {
     email: string;
     role: string;
   }): string {
-    return this.jwt.sign({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    return this.jwt.sign({ sub: user.id, email: user.email, role: user.role });
   }
 
   async register(dto: RegisterDto): Promise<RegisterResponseDto> {
@@ -78,9 +78,8 @@ export class AuthService {
         message: 'Account created. Please verify your email.',
       };
     } catch (error) {
-      if (isUniqueConstraintError(error)) {
-        throw new ConflictException('Email already in use');
-      }
+      if (isUniqueConstraintError(error))
+        throw new UserAlreadyExistsException();
       throw error;
     }
   }
@@ -156,22 +155,16 @@ export class AuthService {
   ): Promise<{ response: LoginResponseDto; refreshToken: string }> {
     const user = await this.users.findByEmailWithProfile(dto.email);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!user) throw new InvalidCredentialsException();
 
     const isValidPassword = await bcrypt.compare(dto.password, user.password);
 
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!isValidPassword) throw new InvalidCredentialsException();
 
-    if (user.status === UserStatus.PENDING) {
-      throw new ForbiddenException('Please verify your email first');
-    }
+    if (user.status === UserStatus.PENDING)
+      throw new EmailNotVerifiedException();
 
     const accessToken = this.generateAccessToken(user);
-
     const refreshToken = await this.tokens.createRefreshToken({
       userId: user.id,
       ...meta,
@@ -204,18 +197,14 @@ export class AuthService {
     rawToken: string | undefined,
     meta: RequestMetaType,
   ): Promise<{ response: LoginResponseDto; newRefreshToken: string }> {
-    if (!rawToken) {
-      throw new UnauthorizedException('Missing refresh token');
-    }
+    if (!rawToken) throw new MissingRefreshTokenException();
 
     const { rawToken: newRawToken, userId } =
       await this.tokens.rotateRefreshToken(rawToken, meta);
 
     const user = await this.users.findByIdWithProfile(userId);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
+    if (!user) throw new InvalidRefreshTokenException();
 
     // @TODO: Handle BANNED status
     // if (user.status === UserStatus.BANNED) {

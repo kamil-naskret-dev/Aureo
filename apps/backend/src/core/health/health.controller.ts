@@ -7,7 +7,7 @@ import {
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
 
-import { SWAGGER_TAGS } from '../common/constants/swagger.constants.js';
+import { SWAGGER_TAGS } from '../../common/constants/swagger.constants.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @ApiTags(SWAGGER_TAGS.HEALTH)

@@ -22,7 +22,7 @@ import {
 
 import * as Express from 'express';
 
-import { SWAGGER_TAGS } from '../common/constants/swagger.constants';
+import { SWAGGER_TAGS } from '../../common/constants/swagger.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login/login.dto';
 import { LoginResponseDto } from './dto/login/login-response.dto';
@@ -37,9 +37,9 @@ import { ResetPasswordDto } from './dto/reset-password/reset-password.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password/reset-password-response.dto';
 import { VerifyEmailQueryDto } from './dto/verify-email/verify-email-query.dto';
 import { VerifyEmailResponseDto } from './dto/verify-email/verify-email-response.dto';
-import { Public } from '../common/decorators/public.decorator';
-import { RequestMeta } from '../common/decorators/request-meta.decorator';
-import { type RequestMetaType } from '../common/types/request-meta.type';
+import { Public } from '../../common/decorators/public.decorator';
+import { RequestMeta } from '../../common/decorators/request-meta.decorator';
+import { type RequestMetaType } from '../../common/types/request-meta.type';
 import { CookieService } from './infrastructure/cookie/cookie.service';
 
 @Public()

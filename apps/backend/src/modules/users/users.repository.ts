@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User, UserStatus } from '@prisma/client';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
 import { CreateUserInputDto } from './dto/create-user.dto';
 
 @Injectable()
-export class UsersService {
+export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findById(id: string): Promise<User | null> {
+  findById(id: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
-  async findByIdWithProfile(
+  findByIdWithProfile(
     id: string,
   ): Promise<Prisma.UserGetPayload<{ include: { profile: true } }> | null> {
     return this.prisma.user.findUnique({
@@ -21,7 +21,11 @@ export class UsersService {
     });
   }
 
-  async findByEmailWithProfile(
+  findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email } });
+  }
+
+  findByEmailWithProfile(
     email: string,
   ): Promise<Prisma.UserGetPayload<{ include: { profile: true } }> | null> {
     return this.prisma.user.findUnique({
@@ -30,25 +34,7 @@ export class UsersService {
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { email } });
-  }
-
-  async activateUser(id: string): Promise<void> {
-    await this.prisma.user.updateMany({
-      where: { id, status: { not: UserStatus.ACTIVE } },
-      data: { status: UserStatus.ACTIVE },
-    });
-  }
-
-  async updatePassword(id: string, hashedPassword: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id },
-      data: { password: hashedPassword },
-    });
-  }
-
-  async create(data: CreateUserInputDto): Promise<User> {
+  createWithProfile(data: CreateUserInputDto): Promise<User> {
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -64,5 +50,17 @@ export class UsersService {
 
       return user;
     });
+  }
+
+  updatePassword(id: string, hashedPassword: string): Promise<void> {
+    return this.prisma.user
+      .update({ where: { id }, data: { password: hashedPassword } })
+      .then();
+  }
+
+  updateStatus(id: string, status: UserStatus): Promise<void> {
+    return this.prisma.user
+      .updateMany({ where: { id, status: { not: status } }, data: { status } })
+      .then();
   }
 }

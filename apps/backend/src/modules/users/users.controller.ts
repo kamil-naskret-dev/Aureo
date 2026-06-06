@@ -1,10 +1,10 @@
-import { Controller, Get, NotFoundException } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-import { ApiAuth } from '../common/decorators/api-auth.decorator';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { SWAGGER_TAGS } from '../common/constants/swagger.constants';
-import { type JwtPayload } from '../common/types/jwt-payload.type';
+import { ApiAuth } from '../../common/decorators/api-auth.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { SWAGGER_TAGS } from '../../common/constants/swagger.constants';
+import { type JwtPayload } from '../../common/types/jwt-payload.type';
 import { MeResponseDto } from './dto/me-response.dto';
 import { UsersService } from './users.service';
 
@@ -18,11 +18,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get current authenticated user profile' })
   @ApiOkResponse({ type: MeResponseDto })
   async getMe(@CurrentUser() currentUser: JwtPayload): Promise<MeResponseDto> {
-    const user = await this.users.findByIdWithProfile(currentUser.sub);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.users.getProfile(currentUser.sub);
 
     return {
       id: user.id,
