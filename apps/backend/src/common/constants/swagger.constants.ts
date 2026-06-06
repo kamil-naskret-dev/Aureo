@@ -7,6 +7,7 @@ export const SWAGGER_BEARER_NAME = 'JWT';
 export const SWAGGER_TAGS = {
   AUTH: 'auth',
   USERS: 'users',
+  ADMIN: 'admin',
   BOOKMARKS: 'bookmarks',
   TAGS: 'tags',
   HEALTH: 'health',

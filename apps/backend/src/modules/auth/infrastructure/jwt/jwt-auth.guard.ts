@@ -10,15 +10,18 @@ import { Request } from 'express';
 
 import { IS_PUBLIC_KEY } from '../../../../common/decorators/public.decorator';
 import { JwtPayload } from '../../../../common/types/jwt-payload.type';
+import { UserBannedException } from '../../../../common/exceptions/ban.exceptions';
+import { BanCacheService } from '../../../bans/ban-cache.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwt: JwtService,
     private readonly reflector: Reflector,
+    private readonly banCache: BanCacheService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -33,13 +36,20 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Missing token');
     }
 
+    let payload: JwtPayload;
+
     try {
-      const payload = this.jwt.verify<JwtPayload>(token);
-      request['user'] = payload;
-      return true;
+      payload = this.jwt.verify<JwtPayload>(token);
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
+
+    if (await this.banCache.isBanned(payload.sub)) {
+      throw new UserBannedException();
+    }
+
+    request['user'] = payload;
+    return true;
   }
 
   private extractToken(request: Request): string | undefined {

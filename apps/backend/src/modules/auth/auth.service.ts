@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { TokenService } from './infrastructure/token/token.service';
 import { AppConfig } from '../../config/app.config';
 import { UsersService } from '../users/users.service';
+import { BanCacheService } from '../bans/ban-cache.service';
 import { NotificationsService } from '../../core/notifications/notifications.service';
 import { VerifyEmailNotification } from '../../core/notifications/templates/verify-email.notification';
 import { ResetPasswordNotification } from '../../core/notifications/templates/reset-password.notification';
@@ -14,6 +15,7 @@ import {
   EmailNotVerifiedException,
   InvalidCredentialsException,
 } from '../../common/exceptions/auth.exceptions';
+import { UserBannedException } from '../../common/exceptions/ban.exceptions';
 import { UserAlreadyExistsException } from '../../common/exceptions/user.exceptions';
 import {
   InvalidRefreshTokenException,
@@ -46,6 +48,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly notifications: NotificationsService,
     private readonly config: ConfigService,
+    private readonly banCache: BanCacheService,
   ) {}
 
   private generateAccessToken(user: {
@@ -192,6 +195,8 @@ export class AuthService {
     if (user.status === UserStatus.PENDING)
       throw new EmailNotVerifiedException();
 
+    if (await this.banCache.isBanned(user.id)) throw new UserBannedException();
+
     const accessToken = this.generateAccessToken(user);
     const refreshToken = await this.tokens.createRefreshToken({
       userId: user.id,
@@ -224,12 +229,6 @@ export class AuthService {
     const user = await this.users.findByIdWithProfile(userId);
 
     if (!user) throw new InvalidRefreshTokenException();
-
-    // @TODO: Handle BANNED status
-    // if (user.status === UserStatus.BANNED) {
-    //   await this.tokens.deleteAllRefreshTokens(userId);
-    //   throw new ForbiddenException('Your account has been banned');
-    // }
 
     const accessToken = this.generateAccessToken(user);
 
