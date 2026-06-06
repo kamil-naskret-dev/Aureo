@@ -29,7 +29,7 @@ const Avatar = ({ user }: { user: AuthUser }) => {
   }
 
   const initials = user.name
-    .split(' ')
+    ?.split(' ')
     .slice(0, 2)
     .map((part) => part[0].toUpperCase())
     .join('');
