@@ -1,4 +1,8 @@
-import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 export class InvalidRefreshTokenException extends UnauthorizedException {
   constructor() {
@@ -21,5 +25,11 @@ export class InvalidVerificationTokenException extends BadRequestException {
 export class InvalidPasswordResetTokenException extends BadRequestException {
   constructor() {
     super('Invalid or expired password reset token');
+  }
+}
+
+export class RefreshTokenReuseException extends ForbiddenException {
+  constructor() {
+    super('Token reuse detected. All sessions have been invalidated.');
   }
 }
