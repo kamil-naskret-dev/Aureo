@@ -19,6 +19,7 @@ import mailConfig from './config/mail.config';
 import redisConfig, { RedisConfig } from './config/redis.config';
 import { HealthModule } from './core/health/health.module';
 import { MailModule } from './core/mail/mail.module';
+import { NotificationsModule } from './core/notifications/notifications.module';
 import { PrismaModule } from './core/prisma/prisma.module';
 
 @Module({
@@ -70,8 +71,9 @@ import { PrismaModule } from './core/prisma/prisma.module';
 
     PrismaModule,
     HealthModule,
-    AuthModule,
     MailModule,
+    NotificationsModule,
+    AuthModule,
     UsersModule,
   ],
   providers: [
