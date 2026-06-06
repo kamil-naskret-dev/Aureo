@@ -3,7 +3,7 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
 import { jwtConfig } from '../../config/jwt.config';
-import { MailModule } from '../../core/mail/mail.module';
+import { NotificationsModule } from '../../core/notifications/notifications.module';
 import { TokenModule } from './infrastructure/token/token.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
@@ -14,7 +14,7 @@ import { CookieModule } from './infrastructure/cookie/cookie.module';
   imports: [
     UsersModule,
     TokenModule,
-    MailModule,
+    NotificationsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [jwtConfig.KEY],

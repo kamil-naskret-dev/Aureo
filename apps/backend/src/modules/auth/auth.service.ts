@@ -7,7 +7,9 @@ import * as bcrypt from 'bcrypt';
 import { TokenService } from './infrastructure/token/token.service';
 import { AppConfig } from '../../config/app.config';
 import { UsersService } from '../users/users.service';
-import { MailService } from '../../core/mail/mail.service';
+import { NotificationsService } from '../../core/notifications/notifications.service';
+import { VerifyEmailNotification } from '../../core/notifications/templates/verify-email.notification';
+import { ResetPasswordNotification } from '../../core/notifications/templates/reset-password.notification';
 import {
   EmailNotVerifiedException,
   InvalidCredentialsException,
@@ -39,7 +41,7 @@ export class AuthService {
     private readonly users: UsersService,
     private readonly tokens: TokenService,
     private readonly jwt: JwtService,
-    private readonly mail: MailService,
+    private readonly notifications: NotificationsService,
     private readonly config: ConfigService,
   ) {}
 
@@ -68,9 +70,11 @@ export class AuthService {
 
       const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
 
-      await this.mail.sendVerificationEmail(
-        user.email,
-        `${frontendUrl}/verify-email?token=${verifyToken}`,
+      await this.notifications.send(
+        { email: user.email },
+        new VerifyEmailNotification(
+          `${frontendUrl}/verify-email?token=${verifyToken}`,
+        ),
       );
 
       return {
@@ -94,9 +98,11 @@ export class AuthService {
     if (user && user.status === UserStatus.ACTIVE) {
       const resetToken = await this.tokens.createPasswordResetToken(user.id);
 
-      await this.mail.sendPasswordResetEmail(
-        user.email,
-        `${frontendUrl}/reset-password?token=${resetToken}`,
+      await this.notifications.send(
+        { email: user.email },
+        new ResetPasswordNotification(
+          `${frontendUrl}/reset-password?token=${resetToken}`,
+        ),
       );
     }
 
@@ -132,9 +138,11 @@ export class AuthService {
     if (user && user.status === UserStatus.PENDING) {
       const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
 
-      await this.mail.sendVerificationEmail(
-        user.email,
-        `${frontendUrl}/verify-email?token=${verifyToken}`,
+      await this.notifications.send(
+        { email: user.email },
+        new VerifyEmailNotification(
+          `${frontendUrl}/verify-email?token=${verifyToken}`,
+        ),
       );
     }
 
