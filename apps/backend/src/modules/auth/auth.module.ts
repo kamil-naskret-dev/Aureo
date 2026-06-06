@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
-import { jwtConfig } from '../config/jwt.config';
-import { MailModule } from '../mail/mail.module';
+import { jwtConfig } from '../../config/jwt.config';
+import { MailModule } from '../../core/mail/mail.module';
 import { TokenModule } from './infrastructure/token/token.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';

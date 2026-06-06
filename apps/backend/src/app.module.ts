@@ -7,9 +7,9 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { JwtAuthGuard } from './auth/infrastructure/jwt/jwt-auth.guard';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { JwtAuthGuard } from './modules/auth/infrastructure/jwt/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import appConfig, { AppConfig } from './config/app.config';
 import { validate } from './config/config.validation';
@@ -17,9 +17,9 @@ import databaseConfig from './config/database.config';
 import { jwtConfig } from './config/jwt.config';
 import mailConfig from './config/mail.config';
 import redisConfig, { RedisConfig } from './config/redis.config';
-import { HealthModule } from './health/health.module';
-import { MailModule } from './mail/mail.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { HealthModule } from './core/health/health.module';
+import { MailModule } from './core/mail/mail.module';
+import { PrismaModule } from './core/prisma/prisma.module';
 
 @Module({
   imports: [
