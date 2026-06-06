@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserStatus } from '@prisma/client';
+import { User, UserRole, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 import { TokenService } from './infrastructure/token/token.service';
@@ -20,7 +20,10 @@ import {
   MissingRefreshTokenException,
 } from '../../common/exceptions/token.exceptions';
 import { LoginDto } from './dto/login/login.dto';
-import { LoginResponseDto } from './dto/login/login-response.dto';
+import {
+  LoggedInUserDto,
+  LoginResponseDto,
+} from './dto/login/login-response.dto';
 import { LogoutResponseDto } from './dto/logout/logout-response.dto';
 import { RegisterDto } from './dto/register/register.dto';
 import { RegisterResponseDto } from './dto/register/register-response.dto';
@@ -48,9 +51,24 @@ export class AuthService {
   private generateAccessToken(user: {
     id: string;
     email: string;
-    role: string;
+    role: UserRole;
   }): string {
     return this.jwt.sign({ sub: user.id, email: user.email, role: user.role });
+  }
+
+  private mapUserToResponse(user: {
+    id: string;
+    email: string;
+    role: UserRole;
+    profile: { name: string; avatarUrl: string | null } | null;
+  }): LoggedInUserDto {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.profile?.name ?? '',
+      role: user.role,
+      image: user.profile?.avatarUrl ?? null,
+    };
   }
 
   async register(dto: RegisterDto): Promise<RegisterResponseDto> {
@@ -61,31 +79,33 @@ export class AuthService {
       PASSWORD_SALT_ROUNDS,
     );
 
+    let user: User;
+
     try {
-      const user = await this.users.create({
+      user = await this.users.create({
         email: dto.email,
         password: hashedPassword,
         name: dto.name,
       });
-
-      const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
-
-      await this.notifications.send(
-        { email: user.email },
-        new VerifyEmailNotification(
-          `${frontendUrl}/verify-email?token=${verifyToken}`,
-        ),
-      );
-
-      return {
-        success: true,
-        message: 'Account created. Please verify your email.',
-      };
     } catch (error) {
       if (isUniqueConstraintError(error))
         throw new UserAlreadyExistsException();
       throw error;
     }
+
+    const verifyToken = await this.tokens.createEmailVerifyToken(user.id);
+
+    await this.notifications.send(
+      { email: user.email },
+      new VerifyEmailNotification(
+        `${frontendUrl}/verify-email?token=${verifyToken}`,
+      ),
+    );
+
+    return {
+      success: true,
+      message: 'Account created. Please verify your email.',
+    };
   }
 
   async forgotPassword(
@@ -179,16 +199,7 @@ export class AuthService {
     });
 
     return {
-      response: {
-        accessToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.profile!.name,
-          role: user.role,
-          image: user.profile?.avatarUrl ?? null,
-        },
-      },
+      response: { accessToken, user: this.mapUserToResponse(user) },
       refreshToken,
     };
   }
@@ -223,16 +234,7 @@ export class AuthService {
     const accessToken = this.generateAccessToken(user);
 
     return {
-      response: {
-        accessToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.profile!.name,
-          role: user.role,
-          image: user.profile?.avatarUrl ?? null,
-        },
-      },
+      response: { accessToken, user: this.mapUserToResponse(user) },
       newRefreshToken: newRawToken,
     };
   }

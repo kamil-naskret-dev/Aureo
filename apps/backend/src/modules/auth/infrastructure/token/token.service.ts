@@ -103,12 +103,6 @@ export class TokenService {
     return { rawToken: newRaw, userId: existing.userId };
   }
 
-  async findActiveRefreshTokens(userId: string): Promise<Token[]> {
-    return this.prisma.token.findMany({
-      where: { userId, type: TokenType.REFRESH, expiresAt: { gt: new Date() } },
-    });
-  }
-
   async deleteByRawToken(rawToken: string): Promise<void> {
     const hashed = this.hash(rawToken);
     await this.prisma.token.deleteMany({
