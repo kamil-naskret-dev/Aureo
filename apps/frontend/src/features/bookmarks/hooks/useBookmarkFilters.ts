@@ -35,6 +35,11 @@ export const useBookmarkFilters = () => {
     return [...result].sort((a, b) => {
       if (sortBy === 'recently-added')
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === 'recently-visited') {
+        const aTime = a.lastVisitedAt ? new Date(a.lastVisitedAt).getTime() : 0;
+        const bTime = b.lastVisitedAt ? new Date(b.lastVisitedAt).getTime() : 0;
+        return bTime - aTime;
+      }
       if (sortBy === 'most-visited') return b.views - a.views;
       return 0;
     });

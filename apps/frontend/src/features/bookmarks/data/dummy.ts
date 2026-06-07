@@ -11,6 +11,8 @@ export type Bookmark = {
   domain: string;
   description: string;
   tags: string[];
+  views: number;
+  lastVisitedAt: string | null;
   createdAt: string;
 };
 
@@ -32,6 +34,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'The AI Toolkit for TypeScript. Unified API for generating text, structured data, and tool calls with LLMs.',
     tags: ['AI', 'TypeScript', 'Tools'],
+    views: 47,
+    lastVisitedAt: '2025-05-10',
     createdAt: '2025-05-01',
   },
   {
@@ -42,6 +46,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'A fully type-safe router with first-class search params, layouts, and nested routing for React applications.',
     tags: ['React', 'TypeScript'],
+    views: 23,
+    lastVisitedAt: '2025-05-08',
     createdAt: '2025-04-28',
   },
   {
@@ -52,6 +58,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'A utility-first CSS framework packed with classes that can be composed to build any design, directly in your markup.',
     tags: ['CSS', 'Design'],
+    views: 61,
+    lastVisitedAt: '2025-05-12',
     createdAt: '2025-04-20',
   },
   {
@@ -62,6 +70,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'Unstyled, accessible components for building high-quality design systems and web applications in React.',
     tags: ['React', 'Design'],
+    views: 9,
+    lastVisitedAt: '2025-04-30',
     createdAt: '2025-04-15',
   },
   {
@@ -72,6 +82,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'Access GPT-4, DALL·E, Whisper and other models via a simple API. Build AI-powered products at scale.',
     tags: ['AI', 'Tools'],
+    views: 102,
+    lastVisitedAt: '2025-05-13',
     createdAt: '2025-04-10',
   },
   {
@@ -82,6 +94,8 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
     description:
       'A small, fast, and scalable bearbones state management solution. Uses simplified flux principles.',
     tags: ['React', 'Tools'],
+    views: 34,
+    lastVisitedAt: null,
     createdAt: '2025-04-05',
   },
 ];
