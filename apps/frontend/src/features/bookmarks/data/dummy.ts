@@ -26,7 +26,7 @@ export const DUMMY_TAGS: Tag[] = [
 export const DUMMY_BOOKMARKS: Bookmark[] = [
   {
     id: '1',
-    title: 'Vercel AI SDK — Build AI-powered applications',
+    title: 'Vercel AI SDK',
     url: 'https://sdk.vercel.ai',
     domain: 'sdk.vercel.ai',
     description:
@@ -36,7 +36,7 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
   },
   {
     id: '2',
-    title: 'TanStack Router — Type-safe routing for React',
+    title: 'TanStack Router',
     url: 'https://tanstack.com/router',
     domain: 'tanstack.com',
     description:
@@ -46,7 +46,7 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
   },
   {
     id: '3',
-    title: 'Tailwind CSS v4 — Utility-first CSS framework',
+    title: 'Tailwind CSS',
     url: 'https://tailwindcss.com',
     domain: 'tailwindcss.com',
     description:
@@ -56,7 +56,7 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
   },
   {
     id: '4',
-    title: 'Radix UI — Accessible component primitives',
+    title: 'Radix UI',
     url: 'https://radix-ui.com',
     domain: 'radix-ui.com',
     description:
@@ -66,7 +66,7 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
   },
   {
     id: '5',
-    title: 'OpenAI Platform — API reference and docs',
+    title: 'OpenAI Platform',
     url: 'https://platform.openai.com',
     domain: 'platform.openai.com',
     description:
@@ -76,7 +76,7 @@ export const DUMMY_BOOKMARKS: Bookmark[] = [
   },
   {
     id: '6',
-    title: 'Zustand — Lightweight state management for React',
+    title: 'Zustand',
     url: 'https://zustand-demo.pmnd.rs',
     domain: 'zustand-demo.pmnd.rs',
     description:

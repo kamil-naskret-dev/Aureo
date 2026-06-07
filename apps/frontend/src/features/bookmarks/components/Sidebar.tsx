@@ -36,7 +36,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
             <Link
               to={to}
               className={cn(
-                'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700  focus-visible:ring-offset-2',
+                'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700  focus-visible:ring-offset-2',
                 pathname === to
                   ? 'bg-custom-neutral-100 border-custom-neutral-100 text-custom-neutral-900 dark:bg-custom-neutral-600 dark:border-transparent dark:text-white'
                   : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900 dark:bg-custom-neutral-800 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-600 dark:hover:border-transparent dark:hover:text-white',

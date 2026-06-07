@@ -1,58 +1,82 @@
+import { DropdownMenuSeparator } from '@aureo/ui';
 import { Bookmark } from '../data/dummy';
 import { BookmarkCardMenu } from './BookmarkCardMenu';
+import { Calendar, Clock, Eye, Pin } from 'lucide-react';
 
 type BookmarkCardProps = {
   bookmark: Bookmark;
 };
 
 export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${bookmark.domain}&sz=32`;
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${bookmark.domain}&sz=48`;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-custom-neutral-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-custom-neutral-700 dark:bg-custom-neutral-900">
-      <div className="flex items-start gap-3">
-        <img
-          src={faviconUrl}
-          alt=""
-          width={20}
-          height={20}
-          className="mt-0.5 size-5 shrink-0 rounded-sm"
-        />
-        <div className="min-w-0 flex-1">
-          <a
-            href={bookmark.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="line-clamp-1 text-sm font-semibold text-custom-neutral-900 hover:text-custom-primary-700 dark:text-white"
-          >
-            {bookmark.title}
-          </a>
-          <p className="mt-0.5 line-clamp-1 text-xs text-custom-neutral-400">{bookmark.domain}</p>
+    <div className="flex flex-col rounded-[12px] bg-white dark:bg-custom-neutral-800 shadow-[0_2px_4px_0px_#1515150F]">
+      <header className="p-4 flex flex-col gap-4">
+        <div className="flex items-start gap-3">
+          <div className="border border-neutral-custom-100 rounded-[8px] p-1 dark:border-custom-neutral-500">
+            <img
+              src={faviconUrl}
+              alt={bookmark.domain}
+              width={44}
+              height={44}
+              className="size-11 shrink-0 rounded-sm"
+            />
+          </div>
+          <div className="min-w-0 flex-1 flex flex-col gap-1">
+            <a
+              href={bookmark.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-fit line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
+            >
+              {bookmark.title}
+            </a>
+            <p className="line-clamp-1 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:text-custom-neutral-100">
+              {bookmark.domain}
+            </p>
+          </div>
+          <BookmarkCardMenu />
         </div>
-        <BookmarkCardMenu />
-      </div>
 
-      <p className="line-clamp-2 text-sm leading-relaxed text-custom-neutral-800 dark:text-custom-neutral-100">
-        {bookmark.description}
-      </p>
+        <DropdownMenuSeparator />
 
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1.5">
+        <p className="text-sm leading-relaxed font-medium tracking-[1%] text-custom-neutral-800 dark:text-custom-neutral-100">
+          {bookmark.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
           {bookmark.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-custom-neutral-100 px-2 py-0.5 text-xs font-medium text-custom-neutral-700 dark:bg-custom-neutral-800 dark:text-custom-neutral-200"
+              className="rounded-[4px] bg-custom-neutral-100 px-2 py-0.5 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:bg-custom-neutral-600 dark:text-custom-neutral-100"
             >
               {tag}
             </span>
           ))}
         </div>
-        <span className="shrink-0 text-xs text-custom-neutral-400">
-          {new Date(bookmark.createdAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          })}
-        </span>
+      </header>
+
+      <div className="border-t border-custom-neutral-300">
+        <ul className="py-3 px-4 flex items-center gap-4">
+          <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
+            <Eye className="size-3.5" />
+            <span className="font-medium text-xs leading-[140%]">47</span>
+          </li>
+          <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
+            <Clock className="size-3.5" />
+            <span className="font-medium text-xs leading-[140%]">23 Sep</span>
+          </li>
+          <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
+            <Calendar className="size-3.5" />
+            <span className="font-medium text-xs leading-[140%]">15 Jan</span>
+          </li>
+          <li className="ml-auto">
+            <button className="p-0.5 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900">
+              <Pin className="size-3.5" />
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   );
