@@ -9,6 +9,7 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { BansModule } from './modules/bans/bans.module';
+import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { UsersModule } from './modules/users/users.module';
 import { JwtAuthGuard } from './modules/auth/infrastructure/jwt/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -78,6 +79,7 @@ import { PrismaModule } from './core/prisma/prisma.module';
     NotificationsModule,
     AuthModule,
     BansModule,
+    BookmarksModule,
     UsersModule,
   ],
   providers: [
