@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardPage,
 });
 
-export type SortOption = 'newest' | 'oldest' | 'title';
+export type SortOption = 'recently-added' | 'recently-visited' | 'most-visited';
 
 function DashboardPage() {
   const user = useUser();
@@ -37,7 +37,7 @@ function DashboardPage() {
             onMenuClick={() => setIsSidebarOpen(true)}
             onAddBookmark={() => setIsModalOpen(true)}
           />
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="flex-1 overflow-y-auto pt-6 px-4 sm:pt-8 sm:px-8 pb-16">
             <BookmarksList />
           </main>
         </div>
