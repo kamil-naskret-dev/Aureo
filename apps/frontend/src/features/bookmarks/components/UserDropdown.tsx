@@ -1,4 +1,7 @@
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,17 +20,7 @@ type UserDropdownProps = {
   user: AuthUser;
 };
 
-const Avatar = ({ user }: { user: AuthUser }) => {
-  if (user.image) {
-    return (
-      <img
-        src={user.image}
-        alt={user.email}
-        className="size-10 shrink-0 rounded-full object-cover aspect-square"
-      />
-    );
-  }
-
+const UserAvatar = ({ user }: { user: AuthUser }) => {
   const initials = user.name
     ?.split(' ')
     .slice(0, 2)
@@ -35,9 +28,10 @@ const Avatar = ({ user }: { user: AuthUser }) => {
     .join('');
 
   return (
-    <div className="size-10 shrink-0 flex items-center justify-center rounded-full bg-custom-primary-700 text-xs font-semibold text-white">
-      {initials}
-    </div>
+    <Avatar>
+      <AvatarImage src={user.image ?? undefined} alt={user.email} />
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
   );
 };
 
@@ -50,22 +44,22 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="shrink-0 rounded-full transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2"
+          className="shrink-0 rounded-full transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-custom-primary-700 dark:focus-visible:outline-custom-neutral-100"
           aria-label="User menu"
         >
-          <Avatar user={user} />
+          <UserAvatar user={user} />
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <div className="px-4 py-3">
           <div className="flex items-center gap-3">
-            <Avatar user={user} />
+            <UserAvatar user={user} />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-custom-neutral-900 leading-[140%]">
+              <p className="truncate text-sm font-semibold text-custom-neutral-900 leading-[140%] dark:text-white">
                 {user.name}
               </p>
-              <p className="text-sm font-medium leading-[150%] tracking-[1%] text-custom-neutral-800">
+              <p className="text-sm font-medium leading-[150%] tracking-[1%] text-custom-neutral-800 dark:text-custom-neutral-100">
                 {user.email}
               </p>
             </div>
@@ -80,11 +74,14 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
               e.preventDefault();
               toggleTheme();
             }}
-            className="text-custom-neutral-800"
+            className="group text-custom-neutral-800 dark:text-custom-neutral-100"
           >
             <Palette className="size-4 shrink-0" />
             Theme
-            <div aria-hidden="true" className="ml-auto">
+            <div
+              aria-hidden="true"
+              className="ml-auto rounded-xl group-focus:outline-2 group-focus:outline-custom-primary-700 group-focus:outline-offset-2 dark:outline-custom-neutral-100"
+            >
               <ThemeToggle isDark={isDark} />
             </div>
           </DropdownMenuItem>
@@ -96,10 +93,10 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
           <DropdownMenuItem
             onClick={() => logout()}
             disabled={isPending}
-            className="text-custom-neutral-800"
+            className="text-custom-neutral-800 dark:text-custom-neutral-100"
           >
             {isPending ? <Spinner className="size-4" /> : <LogOut />}
-            {isPending ? 'Logging out...' : 'Log out'}
+            {isPending ? 'Logging out...' : 'Logout'}
           </DropdownMenuItem>
         </div>
       </DropdownMenuContent>

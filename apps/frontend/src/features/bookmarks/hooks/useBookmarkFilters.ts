@@ -6,7 +6,7 @@ import { DUMMY_BOOKMARKS } from '../data/dummy';
 export const useBookmarkFilters = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [sortBy, setSortBy] = useState<SortOption>('recently-added');
 
   const toggleTag = (tagName: string) => {
     setActiveTags((prev) => {
@@ -33,11 +33,9 @@ export const useBookmarkFilters = () => {
     }
 
     return [...result].sort((a, b) => {
-      if (sortBy === 'newest')
+      if (sortBy === 'recently-added')
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sortBy === 'oldest')
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      if (sortBy === 'title') return a.title.localeCompare(b.title);
+      if (sortBy === 'most-visited') return b.views - a.views;
       return 0;
     });
   }, [searchQuery, activeTags, sortBy]);

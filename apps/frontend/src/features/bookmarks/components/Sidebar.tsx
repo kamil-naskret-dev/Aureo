@@ -22,7 +22,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
   return (
     <aside
       className={cn(
-        'flex w-full max-w-74 gap-4 shrink-0 flex-col border-r border-custom-neutral-300 bg-white dark:border-custom-neutral-700 dark:bg-custom-neutral-900',
+        'flex w-full max-w-74 gap-4 shrink-0 flex-col border-r border-custom-neutral-300 bg-white dark:border-custom-neutral-500 dark:bg-custom-neutral-800',
         className,
       )}
     >
@@ -38,8 +38,8 @@ export const Sidebar = ({ className }: SidebarProps) => {
               className={cn(
                 'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700  focus-visible:ring-offset-2',
                 pathname === to
-                  ? 'bg-custom-neutral-100 border-custom-neutral-100 text-custom-neutral-900'
-                  : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900',
+                  ? 'bg-custom-neutral-100 border-custom-neutral-100 text-custom-neutral-900 dark:bg-custom-neutral-600 dark:border-transparent dark:text-white'
+                  : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900 dark:bg-custom-neutral-800 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-600 dark:hover:border-transparent dark:hover:text-white',
               )}
             >
               <Icon className="size-5 shrink-0" />
@@ -51,7 +51,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
 
       <div className="flex flex-col gap-2 px-4 pb-5">
         <div className="pb-1 px-3 border-b border-transparent">
-          <span className="text-xs font-bold uppercase text-custom-secondary-400 leading-[140%]">
+          <span className="text-xs font-bold uppercase text-custom-secondary-400 leading-[140%] dark:text-custom-neutral-100">
             Tags
           </span>
         </div>
@@ -64,11 +64,11 @@ export const Sidebar = ({ className }: SidebarProps) => {
                   checked={activeTags.has(tag.name)}
                   onCheckedChange={() => toggleTag(tag.name)}
                 />
-                <span className="flex-1 font-semibold text-custom-neutral-800 leading-[140%]">
+                <span className="flex-1 font-semibold text-custom-neutral-800 leading-[140%] dark:text-custom-neutral-100">
                   {tag.name}
                 </span>
-                <div className="border border-custom-neutral-300 rounded-full bg-custom-neutral-100 py-0.5 px-2 flex items-center">
-                  <span className="text-xs font-medium leading-[140%] text-custom-neutral-800">
+                <div className="border border-custom-neutral-300 rounded-full bg-custom-neutral-100 py-0.5 px-2 flex items-center dark:bg-custom-neutral-800 dark:border-custom-neutral-400">
+                  <span className="text-xs font-medium leading-[140%] text-custom-neutral-800 dark:text-white">
                     {tag.count}
                   </span>
                 </div>
