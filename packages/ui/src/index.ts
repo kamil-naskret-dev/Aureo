@@ -12,3 +12,5 @@ export * from './components/ui/dropdown-menu';
 export * from './components/ui/select';
 export * from './components/ui/sheet';
 export * from './components/ui/checkbox';
+export * from './components/ui/skeleton';
+export * from './components/ui/pagination';

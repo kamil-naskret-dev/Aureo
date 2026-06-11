@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Bookmark, Prisma, UserBookmarkState } from '@prisma/client';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { BookmarkSort } from './dto/bookmark-query.dto';
 
 export type BookmarkWithRelations = Prisma.BookmarkGetPayload<{
   include: { tags: { include: { tag: true } }; userStates: true };
@@ -12,6 +13,7 @@ export type BookmarkFilters = {
   tags?: string[];
   archived?: boolean;
   pinned?: boolean;
+  sort?: BookmarkSort;
 };
 
 @Injectable()
@@ -36,11 +38,13 @@ export class BookmarksRepository {
   ): Promise<{ data: BookmarkWithRelations[]; total: number }> {
     const where = this.buildWhereClause(userId, filters);
 
+    const orderBy = this.buildOrderBy(filters.sort);
+
     const [data, total] = await this.prisma.$transaction([
       this.prisma.bookmark.findMany({
         where,
         include: { tags: { include: { tag: true } }, userStates: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -142,6 +146,19 @@ export class BookmarksRepository {
     return this.prisma.userBookmarkState.findUnique({
       where: { userId_bookmarkId: { userId, bookmarkId } },
     });
+  }
+
+  private buildOrderBy(
+    sort?: BookmarkSort,
+  ): Prisma.BookmarkOrderByWithRelationInput {
+    switch (sort) {
+      case BookmarkSort.MOST_VISITED:
+        return { views: 'desc' };
+      case BookmarkSort.RECENTLY_VISITED:
+        return { updatedAt: 'desc' };
+      default:
+        return { createdAt: 'desc' };
+    }
   }
 
   private buildWhereClause(

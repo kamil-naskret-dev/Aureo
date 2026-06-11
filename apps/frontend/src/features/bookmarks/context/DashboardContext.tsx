@@ -1,16 +1,65 @@
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
-import { useBookmarkFilters } from '../hooks/useBookmarkFilters';
-import { Bookmark } from '../data/dummy';
-import { SortOption } from '../../../routes/_authenticated/dashboard';
+import { SortOption } from '../types/bookmark.types';
 
-type DashboardContextValue = ReturnType<typeof useBookmarkFilters>;
+type DashboardContextValue = {
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
+  activeTags: Set<string>;
+  toggleTag: (tag: string) => void;
+  sortBy: SortOption;
+  setSortBy: (sort: SortOption) => void;
+  page: number;
+  setPage: (page: number) => void;
+};
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
-  const filters = useBookmarkFilters();
-  return <DashboardContext.Provider value={filters}>{children}</DashboardContext.Provider>;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState<SortOption>('recently-added');
+  const [page, setPage] = useState(1);
+
+  const toggleTag = (tag: string) => {
+    setActiveTags((prev) => {
+      const next = new Set(prev);
+      if (next.has(tag)) {
+        next.delete(tag);
+      } else {
+        next.add(tag);
+      }
+      return next;
+    });
+    setPage(1);
+  };
+
+  const handleSetSearchQuery = (q: string) => {
+    setSearchQuery(q);
+    setPage(1);
+  };
+
+  const handleSetSortBy = (sort: SortOption) => {
+    setSortBy(sort);
+    setPage(1);
+  };
+
+  return (
+    <DashboardContext.Provider
+      value={{
+        searchQuery,
+        setSearchQuery: handleSetSearchQuery,
+        activeTags,
+        toggleTag,
+        sortBy,
+        setSortBy: handleSetSortBy,
+        page,
+        setPage,
+      }}
+    >
+      {children}
+    </DashboardContext.Provider>
+  );
 };
 
 export const useDashboard = (): DashboardContextValue => {
@@ -18,5 +67,3 @@ export const useDashboard = (): DashboardContextValue => {
   if (!ctx) throw new Error('useDashboard must be used within DashboardProvider');
   return ctx;
 };
-
-export type { Bookmark, SortOption };

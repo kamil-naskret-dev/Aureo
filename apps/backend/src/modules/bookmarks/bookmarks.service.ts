@@ -57,6 +57,7 @@ export class BookmarksService {
         tags: query.tags,
         archived: query.archived,
         pinned: query.pinned,
+        sort: query.sort,
       },
       page,
       limit,

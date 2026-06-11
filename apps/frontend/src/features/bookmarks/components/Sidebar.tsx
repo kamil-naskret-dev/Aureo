@@ -27,7 +27,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       )}
     >
       <div className="pt-5 px-5 pb-2.5">
-        <Logo />
+        <Logo aria-label="Bookmark Manager" />
       </div>
 
       <nav className="flex flex-col px-4">
@@ -42,7 +42,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
                   : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900 dark:bg-custom-neutral-800 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-600 dark:hover:border-transparent dark:hover:text-white',
               )}
             >
-              <Icon className="size-5 shrink-0" />
+              <Icon className="size-5 shrink-0" aria-hidden="true" />
               {label}
             </Link>
           </div>
