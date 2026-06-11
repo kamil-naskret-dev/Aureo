@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
@@ -10,6 +11,12 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+
+export enum BookmarkSort {
+  RECENTLY_ADDED = 'recently-added',
+  RECENTLY_VISITED = 'recently-visited',
+  MOST_VISITED = 'most-visited',
+}
 
 export class BookmarkQueryDto {
   @ApiPropertyOptional({ example: 'typescript' })
@@ -38,6 +45,14 @@ export class BookmarkQueryDto {
   @IsBoolean()
   @Transform(({ value }) => value === 'true' || value === true)
   pinned?: boolean;
+
+  @ApiPropertyOptional({
+    enum: BookmarkSort,
+    default: BookmarkSort.RECENTLY_ADDED,
+  })
+  @IsOptional()
+  @IsEnum(BookmarkSort)
+  sort?: BookmarkSort = BookmarkSort.RECENTLY_ADDED;
 
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()

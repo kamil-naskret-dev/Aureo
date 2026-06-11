@@ -13,8 +13,6 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardPage,
 });
 
-export type SortOption = 'recently-added' | 'recently-visited' | 'most-visited';
-
 function DashboardPage() {
   const user = useUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
