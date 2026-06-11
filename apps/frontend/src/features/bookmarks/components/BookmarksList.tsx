@@ -32,7 +32,7 @@ export const BookmarksList = () => {
               type="button"
               className="flex items-center bg-white text-custom-neutral-900 border border-custom-neutral-400 gap-2 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-custom-neutral-300 dark:hover:bg-custom-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-custom-primary-700 dark:bg-custom-neutral-800 dark:text-white dark:border-custom-neutral-400 dark:focus-visible:outline-custom-neutral-100"
             >
-              <ArrowDownUp className="size-4 shrink-0" />
+              <ArrowDownUp className="size-4 shrink-0" aria-hidden="true" />
               Sort By
             </button>
           </DropdownMenuTrigger>
@@ -45,7 +45,7 @@ export const BookmarksList = () => {
                 className="justify-between text-custom-neutral-800 dark:text-custom-neutral-100"
               >
                 {opt.label}
-                {sortBy === opt.value && <Check className="size-4 shrink-0" />}
+                {sortBy === opt.value && <Check className="size-4 shrink-0" aria-hidden="true" />}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

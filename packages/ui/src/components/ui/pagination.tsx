@@ -26,7 +26,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
         className={btnNav}
         aria-label="Previous page"
       >
-        <ChevronLeft className="size-4" />
+        <ChevronLeft className="size-4" aria-hidden="true" />
       </button>
 
       {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -49,7 +49,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
         className={btnNav}
         aria-label="Next page"
       >
-        <ChevronRight className="size-4" />
+        <ChevronRight className="size-4" aria-hidden="true" />
       </button>
     </div>
   );

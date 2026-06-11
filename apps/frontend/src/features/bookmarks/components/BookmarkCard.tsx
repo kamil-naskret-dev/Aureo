@@ -63,11 +63,11 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
       <div className="border-t border-custom-neutral-300">
         <ul className="py-3 px-4 flex items-center gap-4">
           <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
-            <Eye className="size-3.5" />
+            <Eye className="size-3.5" aria-hidden="true" />
             <span className="font-medium text-xs leading-[140%]">{bookmark.views}</span>
           </li>
           <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
-            <Clock className="size-3.5" />
+            <Clock className="size-3.5" aria-hidden="true" />
             <span className="font-medium text-xs leading-[140%]">
               {new Date(bookmark.updatedAt).toLocaleDateString('en-US', {
                 day: 'numeric',
@@ -76,7 +76,7 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
             </span>
           </li>
           <li className="flex items-center gap-1.5 text-custom-neutral-800 dark:text-custom-neutral-100">
-            <Calendar className="size-3.5" />
+            <Calendar className="size-3.5" aria-hidden="true" />
             <span className="font-medium text-xs leading-[140%]">
               {new Date(bookmark.createdAt).toLocaleDateString('en-US', {
                 day: 'numeric',
@@ -87,9 +87,10 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
           <li className="ml-auto">
             <button
               type="button"
+              aria-label="Card is pinned"
               className="p-0.5 outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
             >
-              <Pin className="size-3.5" />
+              <Pin className="size-3.5" aria-hidden="true" />
             </button>
           </li>
         </ul>
