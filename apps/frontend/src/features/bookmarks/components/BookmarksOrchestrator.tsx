@@ -1,4 +1,5 @@
 import { Pagination } from '@aureo/ui';
+import { useMemo } from 'react';
 
 import { useDashboard } from '../context/DashboardContext';
 import { BOOKMARKS_LIMIT, useBookmarks } from '../hooks/useBookmarks';
@@ -26,13 +27,16 @@ const BookmarksEmpty = () => (
 export const BookmarksOrchestrator = () => {
   const { searchQuery, activeTags, sortBy, page, setPage } = useDashboard();
 
-  const query = {
-    search: searchQuery || undefined,
-    tags: activeTags.size > 0 ? [...activeTags] : undefined,
-    sort: sortBy,
-    page,
-    limit: BOOKMARKS_LIMIT,
-  };
+  const query = useMemo(
+    () => ({
+      search: searchQuery || undefined,
+      tags: activeTags.size > 0 ? Array.from(activeTags) : undefined,
+      sort: sortBy,
+      page,
+      limit: BOOKMARKS_LIMIT,
+    }),
+    [searchQuery, activeTags, sortBy, page],
+  );
 
   const { data, isLoading, isError } = useBookmarks(query);
 
@@ -40,7 +44,7 @@ export const BookmarksOrchestrator = () => {
   if (isError) return <BookmarksError />;
 
   const bookmarks = data?.data ?? [];
-  const totalPages = Math.ceil((data?.total ?? 0) / BOOKMARKS_LIMIT);
+  const totalPages = Math.ceil((data?.total ?? 0) / (data?.limit ?? BOOKMARKS_LIMIT));
 
   if (bookmarks.length === 0) return <BookmarksEmpty />;
 

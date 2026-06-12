@@ -18,7 +18,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
       : `${btnBase} border-custom-neutral-300 text-custom-neutral-800 text-sm font-semibold hover:bg-custom-neutral-100 dark:border-custom-neutral-500 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-700`;
 
   return (
-    <div className="flex items-center justify-center gap-1">
+    <nav aria-label="Pagination" className="flex items-center justify-center gap-1">
       <button
         type="button"
         onClick={() => onPageChange(page - 1)}
@@ -51,7 +51,7 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
       >
         <ChevronRight className="size-4" aria-hidden="true" />
       </button>
-    </div>
+    </nav>
   );
 };
 
