@@ -36,20 +36,41 @@ export class BookmarksRepository {
     page: number,
     limit: number,
   ): Promise<{ data: BookmarkWithRelations[]; total: number }> {
-    const where = this.buildWhereClause(userId, filters);
+    const orderSql = this.buildRawOrderBy(filters.sort);
+    const conditions = this.buildRawConditions(userId, filters);
+    const whereSql = Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
 
-    const orderBy = this.buildOrderBy(filters.sort);
-
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.bookmark.findMany({
-        where,
-        include: { tags: { include: { tag: true } }, userStates: true },
-        orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      this.prisma.bookmark.count({ where }),
+    const [rows, countResult] = await this.prisma.$transaction([
+      this.prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
+        SELECT b.id
+        FROM "Bookmark" b
+        LEFT JOIN "UserBookmarkState" ubs
+          ON b.id = ubs."bookmarkId" AND ubs."userId" = ${userId}
+        ${whereSql}
+        ORDER BY COALESCE(ubs.pinned, false) DESC, ${orderSql}
+        LIMIT ${limit} OFFSET ${(page - 1) * limit}
+      `),
+      this.prisma.$queryRaw<[{ count: bigint }]>(Prisma.sql`
+        SELECT COUNT(*) as count
+        FROM "Bookmark" b
+        LEFT JOIN "UserBookmarkState" ubs
+          ON b.id = ubs."bookmarkId" AND ubs."userId" = ${userId}
+        ${whereSql}
+      `),
     ]);
+
+    const total = Number(countResult[0].count);
+
+    if (rows.length === 0) return { data: [], total };
+
+    const ids = rows.map((r) => r.id);
+
+    const unsorted = await this.prisma.bookmark.findMany({
+      where: { id: { in: ids } },
+      include: { tags: { include: { tag: true } }, userStates: true },
+    });
+
+    const data = ids.map((id) => unsorted.find((b) => b.id === id)!);
 
     return { data, total };
   }
@@ -148,47 +169,59 @@ export class BookmarksRepository {
     });
   }
 
-  private buildOrderBy(
-    sort?: BookmarkSort,
-  ): Prisma.BookmarkOrderByWithRelationInput {
+  private buildRawOrderBy(sort?: BookmarkSort): Prisma.Sql {
     switch (sort) {
       case BookmarkSort.MOST_VISITED:
-        return { views: 'desc' };
+        return Prisma.sql`b.views DESC`;
       case BookmarkSort.RECENTLY_VISITED:
-        return { updatedAt: 'desc' };
+        return Prisma.sql`b."updatedAt" DESC`;
       default:
-        return { createdAt: 'desc' };
+        return Prisma.sql`b."createdAt" DESC`;
     }
   }
 
-  private buildWhereClause(
+  private buildRawConditions(
     userId: string,
     filters: BookmarkFilters,
-  ): Prisma.BookmarkWhereInput {
-    const where: Prisma.BookmarkWhereInput = { userId };
+  ): Prisma.Sql[] {
+    const conditions: Prisma.Sql[] = [Prisma.sql`b."userId" = ${userId}`];
 
     if (filters.search) {
-      where.OR = [
-        { title: { contains: filters.search, mode: 'insensitive' } },
-        { description: { contains: filters.search, mode: 'insensitive' } },
-        { url: { contains: filters.search, mode: 'insensitive' } },
-      ];
+      const term = `%${filters.search}%`;
+      conditions.push(Prisma.sql`(
+        b.title ILIKE ${term} OR
+        b.description ILIKE ${term} OR
+        b.url ILIKE ${term}
+      )`);
     }
 
     if (filters.tags?.length) {
-      where.tags = {
-        some: { tag: { name: { in: filters.tags } } },
-      };
+      conditions.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM "BookmarkTag" bt
+        JOIN "Tag" t ON bt."tagId" = t.id
+        WHERE bt."bookmarkId" = b.id
+        AND t.name IN (${Prisma.join(filters.tags)})
+      )`);
     }
 
-    if (filters.archived !== undefined || filters.pinned !== undefined) {
-      const stateFilter: Prisma.UserBookmarkStateWhereInput = { userId };
-      if (filters.archived !== undefined)
-        stateFilter.archived = filters.archived;
-      if (filters.pinned !== undefined) stateFilter.pinned = filters.pinned;
-      where.userStates = { some: stateFilter };
+    if (filters.archived !== undefined) {
+      conditions.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM "UserBookmarkState" s
+        WHERE s."bookmarkId" = b.id
+        AND s."userId" = ${userId}
+        AND s.archived = ${filters.archived}
+      )`);
     }
 
-    return where;
+    if (filters.pinned !== undefined) {
+      conditions.push(Prisma.sql`EXISTS (
+        SELECT 1 FROM "UserBookmarkState" s
+        WHERE s."bookmarkId" = b.id
+        AND s."userId" = ${userId}
+        AND s.pinned = ${filters.pinned}
+      )`);
+    }
+
+    return conditions;
   }
 }

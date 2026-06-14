@@ -60,7 +60,7 @@
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(34.281% 0.05872 193.095);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -152,4 +152,10 @@
   html {
     @apply font-sans antialiased;
   }
+}
+
+.custom-toast {
+  --offset-top: 100px !important;
+  --offset-right: 40px !important;
+  --mobile-offset-top: 70px !important;
 }

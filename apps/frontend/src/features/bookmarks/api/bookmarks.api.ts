@@ -28,3 +28,13 @@ export const toggleArchiveApi = async (id: string): Promise<BookmarkResponse> =>
 export const deleteBookmarkApi = async (id: string): Promise<void> => {
   await http.delete(`/api/bookmarks/${id}`);
 };
+
+export const createBookmarkApi = async (data: {
+  url: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+}): Promise<BookmarkResponse> => {
+  const response = await http.post<ApiEnvelope<BookmarkResponse>>('/api/bookmarks', data);
+  return response.data.data;
+};
