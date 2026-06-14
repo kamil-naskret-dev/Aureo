@@ -16,3 +16,4 @@ export * from './components/ui/skeleton';
 export * from './components/ui/pagination';
 export * from './components/ui/sonner';
 export * from './components/ui/alert-dialog';
+export * from './components/ui/tooltip';

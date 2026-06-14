@@ -100,12 +100,13 @@ export class BookmarksService {
   }
 
   async togglePin(userId: string, id: string): Promise<BookmarkResponseDto> {
-    const bookmark = await this.bookmarks.findById(id, userId);
-    if (!bookmark) throw new BookmarkNotFoundException();
-
     const currentState = await this.bookmarks.getState(userId, id);
-    const pinned = !currentState?.pinned;
+    if (currentState === null) {
+      const exists = await this.bookmarks.findById(id, userId);
+      if (!exists) throw new BookmarkNotFoundException();
+    }
 
+    const pinned = !currentState?.pinned;
     await this.bookmarks.upsertState(userId, id, {
       pinned,
       pinnedAt: pinned ? new Date() : null,
@@ -119,12 +120,13 @@ export class BookmarksService {
     userId: string,
     id: string,
   ): Promise<BookmarkResponseDto> {
-    const bookmark = await this.bookmarks.findById(id, userId);
-    if (!bookmark) throw new BookmarkNotFoundException();
-
     const currentState = await this.bookmarks.getState(userId, id);
-    const archived = !currentState?.archived;
+    if (currentState === null) {
+      const exists = await this.bookmarks.findById(id, userId);
+      if (!exists) throw new BookmarkNotFoundException();
+    }
 
+    const archived = !currentState?.archived;
     await this.bookmarks.upsertState(userId, id, {
       archived,
       archivedAt: archived ? new Date() : null,

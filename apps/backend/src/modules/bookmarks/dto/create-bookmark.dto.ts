@@ -11,12 +11,12 @@ import {
 export class CreateBookmarkDto {
   @ApiProperty({ example: 'https://example.com' })
   @IsUrl()
-  @MaxLength(2048)
+  @MaxLength(1000)
   url!: string;
 
   @ApiProperty({ example: 'Example Domain' })
   @IsString()
-  @MaxLength(500)
+  @MaxLength(100)
   title!: string;
 
   @ApiPropertyOptional({ example: 'A short description' })

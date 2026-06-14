@@ -41,7 +41,9 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(bookmark.url);
-      toast.success('URL copied to clipboard');
+      toast.success('Link copied to clipboard.', {
+        icon: <Copy className="size-5" aria-hidden="true" />,
+      });
     } catch {
       toast.error('Failed to copy URL');
     }
@@ -109,7 +111,7 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Delete bookmark?</AlertDialogTitle>
           <AlertDialogDescription>
-            <span className="font-semibold text-custom-neutral-900 dark:text-white">
+            <span className="font-semibold text-custom-neutral-900 dark:text-white break-words">
               {bookmark.title}
             </span>{' '}
             will be permanently deleted. This action cannot be undone.

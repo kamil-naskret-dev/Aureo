@@ -11,11 +11,11 @@ const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
 
   const btnBase =
     'flex items-center justify-center size-9 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2';
-  const btnNav = `${btnBase} border-custom-neutral-300 text-custom-neutral-800 hover:bg-custom-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed dark:border-custom-neutral-500 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-700`;
+  const btnNav = `${btnBase} bg-white border-custom-neutral-300 text-custom-neutral-800 hover:bg-custom-neutral-100 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-custom-neutral-800 dark:border-custom-neutral-500 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-700`;
   const btnPage = (p: number) =>
     p === page
       ? `${btnBase} border-custom-primary-700 bg-custom-primary-700 text-white`
-      : `${btnBase} border-custom-neutral-300 text-custom-neutral-800 text-sm font-semibold hover:bg-custom-neutral-100 dark:border-custom-neutral-500 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-700`;
+      : `${btnBase} bg-white border-custom-neutral-300 text-custom-neutral-800 text-sm font-semibold hover:bg-custom-neutral-100 dark:bg-custom-neutral-800 dark:border-custom-neutral-500 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-700`;
 
   return (
     <nav aria-label="Pagination" className="flex items-center justify-center gap-1">

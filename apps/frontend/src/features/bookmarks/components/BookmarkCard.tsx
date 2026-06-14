@@ -1,4 +1,10 @@
-import { DropdownMenuSeparator } from '@aureo/ui';
+import {
+  DropdownMenuSeparator,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@aureo/ui';
 import { Calendar, Clock, Eye, Pin } from 'lucide-react';
 
 import { BookmarkResponse } from '../types/bookmark.types';
@@ -13,7 +19,7 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
   const isPinned = bookmark.state?.pinned ?? false;
 
   return (
-    <div className="flex flex-col rounded-[12px] bg-white dark:bg-custom-neutral-800 shadow-[0_2px_4px_0px_#1515150F]">
+    <div className="min-h-76 flex flex-col rounded-[12px] bg-white dark:bg-custom-neutral-800 shadow-[0_2px_4px_0px_#1515150F]">
       <div className="p-4 flex flex-col gap-4 grow">
         <div className="flex items-start gap-3">
           <div className="border border-neutral-custom-100 rounded-[8px] p-1 dark:border-custom-neutral-500">
@@ -30,7 +36,7 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
               href={bookmark.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-fit line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
+              className="line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
             >
               {bookmark.title}
             </a>
@@ -44,19 +50,43 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
         <DropdownMenuSeparator />
 
         <div className="flex flex-col gap-4 grow">
-          <p className="text-sm leading-relaxed font-medium tracking-[1%] text-custom-neutral-800 dark:text-custom-neutral-100">
-            {bookmark.description}
+          <p className="text-sm leading-relaxed font-medium tracking-[1%] text-custom-neutral-800 dark:text-custom-neutral-100 wrap-break-word line-clamp-3">
+            {bookmark.description || 'Brak opisu'}
           </p>
 
-          <ul className="flex flex-wrap gap-2" aria-label="Tags">
-            {bookmark.tags.map((tag) => (
+          <ul className="mt-auto flex flex-wrap gap-2" aria-label="Tags">
+            {bookmark.tags.slice(0, 5).map((tag) => (
               <li
                 key={tag}
-                className="rounded-[4px] bg-custom-neutral-100 px-2 py-0.5 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:bg-custom-neutral-600 dark:text-custom-neutral-100"
+                title={tag}
+                className="max-w-[120px] truncate rounded-[4px] bg-custom-neutral-100 px-2 py-0.5 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:bg-custom-neutral-600 dark:text-custom-neutral-100"
               >
                 {tag}
               </li>
             ))}
+            {bookmark.tags.length > 5 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <li className="cursor-default rounded-[4px] bg-custom-neutral-100 px-2 py-0.5 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:bg-custom-neutral-600 dark:text-custom-neutral-100">
+                      +{bookmark.tags.length - 5}
+                    </li>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[200px]">
+                    <div className="flex flex-wrap gap-1">
+                      {bookmark.tags.slice(5).map((tag) => (
+                        <span
+                          key={tag}
+                          className="max-w-[160px] truncate rounded-[3px] bg-custom-neutral-700 dark:bg-custom-neutral-600 px-1.5 py-0.5 text-[11px] text-white"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </ul>
         </div>
       </div>
