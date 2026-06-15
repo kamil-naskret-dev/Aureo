@@ -13,7 +13,10 @@ import {
 export const useBookmarkActions = () => {
   const queryClient = useQueryClient();
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+    queryClient.invalidateQueries({ queryKey: ['tags'] });
+  };
 
   const pin = useMutation({
     mutationFn: ({ id }: { id: string; pinned: boolean }) => togglePinApi(id),

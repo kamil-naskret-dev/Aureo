@@ -7,6 +7,7 @@ import {
 import { ArrowDownUp, Check } from 'lucide-react';
 import { useState } from 'react';
 
+import { useArchived } from '../context/ArchivedContext';
 import { useSearch } from '../context/SearchContext';
 import { SortOption } from '../types/bookmark.types';
 import { BookmarksOrchestrator } from './BookmarksOrchestrator';
@@ -19,6 +20,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 export const ArchivedList = () => {
   const { searchQuery } = useSearch();
+  const { activeTags } = useArchived();
   const [sortBy, setSortBy] = useState<SortOption>('recently-added');
   const [page, setPage] = useState(1);
 
@@ -60,7 +62,7 @@ export const ArchivedList = () => {
 
       <BookmarksOrchestrator
         searchQuery={searchQuery}
-        activeTags={new Set()}
+        activeTags={activeTags}
         sortBy={sortBy}
         page={page}
         onPageChange={setPage}

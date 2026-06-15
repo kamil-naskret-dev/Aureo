@@ -1,6 +1,11 @@
 import { ApiEnvelope } from '../../../lib/http/api-types';
 import { http } from '../../../lib/http/http';
-import { BookmarkResponse, BookmarksQuery, PaginatedBookmarks } from '../types/bookmark.types';
+import {
+  BookmarkResponse,
+  BookmarksQuery,
+  PaginatedBookmarks,
+  TagWithCount,
+} from '../types/bookmark.types';
 
 export const fetchBookmarks = async (query: BookmarksQuery): Promise<PaginatedBookmarks> => {
   const params = new URLSearchParams();
@@ -28,6 +33,12 @@ export const toggleArchiveApi = async (id: string): Promise<BookmarkResponse> =>
 
 export const deleteBookmarkApi = async (id: string): Promise<void> => {
   await http.delete(`/api/bookmarks/${id}`);
+};
+
+export const fetchTagsApi = async (archived: boolean): Promise<TagWithCount[]> => {
+  const params = new URLSearchParams({ archived: String(archived) });
+  const response = await http.get<ApiEnvelope<TagWithCount[]>>('/api/bookmarks/tags', { params });
+  return response.data.data;
 };
 
 export const createBookmarkApi = async (data: {
