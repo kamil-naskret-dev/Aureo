@@ -16,6 +16,11 @@ export type BookmarkFilters = {
   sort?: BookmarkSort;
 };
 
+export type TagWithCount = {
+  name: string;
+  count: number;
+};
+
 @Injectable()
 export class BookmarksRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -167,6 +172,26 @@ export class BookmarksRepository {
     return this.prisma.userBookmarkState.findUnique({
       where: { userId_bookmarkId: { userId, bookmarkId } },
     });
+  }
+
+  async findUserTags(
+    userId: string,
+    archived: boolean,
+  ): Promise<TagWithCount[]> {
+    const rows = await this.prisma.$queryRaw<TagWithCount[]>(Prisma.sql`
+      SELECT t.name, COUNT(bt."bookmarkId")::int AS count
+      FROM "Tag" t
+      JOIN "BookmarkTag" bt ON bt."tagId" = t.id
+      JOIN "Bookmark" b ON b.id = bt."bookmarkId"
+      LEFT JOIN "UserBookmarkState" ubs
+        ON ubs."bookmarkId" = b.id AND ubs."userId" = ${userId}
+      WHERE b."userId" = ${userId}
+        AND COALESCE(ubs.archived, false) = ${archived}
+      GROUP BY t.name
+      ORDER BY count DESC, t.name ASC
+    `);
+
+    return rows;
   }
 
   private buildRawOrderBy(sort?: BookmarkSort): Prisma.Sql {

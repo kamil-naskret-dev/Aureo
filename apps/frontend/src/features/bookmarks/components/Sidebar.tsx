@@ -1,10 +1,11 @@
-import { Checkbox, cn } from '@aureo/ui';
+import { cn } from '@aureo/ui';
 import { Link, useLocation } from '@tanstack/react-router';
 import { Archive, Home } from 'lucide-react';
 
 import Logo from '../../../assets/icons/logo.svg?react';
+import { useArchived } from '../context/ArchivedContext';
 import { useDashboard } from '../context/DashboardContext';
-import { DUMMY_TAGS } from '../data/dummy';
+import { TagsOrchestrator } from './TagsOrchestrator';
 
 const NAV_LINKS = [
   { to: '/dashboard', label: 'Home', icon: Home },
@@ -17,7 +18,13 @@ type SidebarProps = {
 
 export const Sidebar = ({ className }: SidebarProps) => {
   const { pathname } = useLocation();
-  const { activeTags, toggleTag } = useDashboard();
+  const isArchived = pathname === '/dashboard/archived';
+
+  const dashboard = useDashboard();
+  const archived = useArchived();
+
+  const activeTags = isArchived ? archived.activeTags : dashboard.activeTags;
+  const toggleTag = isArchived ? archived.toggleTag : dashboard.toggleTag;
 
   return (
     <aside
@@ -36,7 +43,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
             <Link
               to={to}
               className={cn(
-                'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700  focus-visible:ring-offset-2',
+                'flex items-center gap-3 rounded-sm px-3 py-2 font-semibold leading-[140%] transition-colors border border-transparent outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2',
                 pathname === to
                   ? 'bg-custom-neutral-100 border-custom-neutral-100 text-custom-neutral-900 dark:bg-custom-neutral-600 dark:border-transparent dark:text-white'
                   : 'text-custom-neutral-800 hover:bg-custom-neutral-100 hover:text-custom-neutral-900 dark:bg-custom-neutral-800 dark:text-custom-neutral-100 dark:hover:bg-custom-neutral-600 dark:hover:border-transparent dark:hover:text-white',
@@ -49,32 +56,15 @@ export const Sidebar = ({ className }: SidebarProps) => {
         ))}
       </nav>
 
-      <div className="flex flex-col gap-2 px-4 pb-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-5">
         <div className="pb-1 px-3 border-b border-transparent">
           <span className="text-xs font-bold uppercase text-custom-secondary-400 leading-[140%] dark:text-custom-neutral-100">
             Tags
           </span>
         </div>
 
-        <div className="flex flex-col">
-          {DUMMY_TAGS.map((tag) => (
-            <div key={tag.id} className="py-0.5">
-              <label className="flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors">
-                <Checkbox
-                  checked={activeTags.has(tag.name)}
-                  onCheckedChange={() => toggleTag(tag.name)}
-                />
-                <span className="flex-1 font-semibold text-custom-neutral-800 leading-[140%] dark:text-custom-neutral-100">
-                  {tag.name}
-                </span>
-                <div className="border border-custom-neutral-300 rounded-full bg-custom-neutral-100 py-0.5 px-2 flex items-center dark:bg-custom-neutral-800 dark:border-custom-neutral-400">
-                  <span className="text-xs font-medium leading-[140%] text-custom-neutral-800 dark:text-white">
-                    {tag.count}
-                  </span>
-                </div>
-              </label>
-            </div>
-          ))}
+        <div className="flex flex-col overflow-y-auto">
+          <TagsOrchestrator archived={isArchived} activeTags={activeTags} onToggleTag={toggleTag} />
         </div>
       </div>
     </aside>

@@ -18,6 +18,13 @@ export enum BookmarkSort {
   MOST_VISITED = 'most-visited',
 }
 
+export class BookmarkTagQueryDto {
+  @ApiPropertyOptional({ default: false })
+  @IsBoolean()
+  @Transform(({ obj, key }) => obj[key] === 'true')
+  archived: boolean = false;
+}
+
 export class BookmarkQueryDto {
   @ApiPropertyOptional({ example: 'typescript' })
   @IsOptional()

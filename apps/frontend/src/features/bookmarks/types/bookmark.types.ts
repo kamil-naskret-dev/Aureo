@@ -25,6 +25,11 @@ export type PaginatedBookmarks = {
   limit: number;
 };
 
+export type TagWithCount = {
+  name: string;
+  count: number;
+};
+
 export type BookmarksQuery = {
   search?: string;
   tags?: string[];

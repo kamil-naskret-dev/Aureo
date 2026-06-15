@@ -13,6 +13,7 @@ import { BookmarkQueryDto } from './dto/bookmark-query.dto';
 import {
   BookmarkResponseDto,
   PaginatedBookmarksDto,
+  TagResponseDto,
 } from './dto/bookmark-response.dto';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
@@ -97,6 +98,10 @@ export class BookmarksService {
     const existing = await this.bookmarks.findById(id, userId);
     if (!existing) throw new BookmarkNotFoundException();
     await this.bookmarks.delete(id, userId);
+  }
+
+  async findTags(userId: string, archived: boolean): Promise<TagResponseDto[]> {
+    return this.bookmarks.findUserTags(userId, archived);
   }
 
   async togglePin(userId: string, id: string): Promise<BookmarkResponseDto> {

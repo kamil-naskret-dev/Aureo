@@ -19,6 +19,11 @@ export class BookmarkResponseDto {
   state!: BookmarkStateDto | null;
 }
 
+export class TagResponseDto {
+  @ApiProperty() name!: string;
+  @ApiProperty() count!: number;
+}
+
 export class PaginatedBookmarksDto {
   @ApiProperty({ type: [BookmarkResponseDto] }) data!: BookmarkResponseDto[];
   @ApiProperty() total!: number;
