@@ -39,7 +39,7 @@ export const UnverifiedEmailAlert = ({ email }: UnverifiedEmailAlertProps) => {
           disabled={isResending}
           className="flex items-center gap-1.5 pl-6.5 font-semibold underline underline-offset-2 disabled:opacity-50"
         >
-          {isResending && <Spinner />}
+          {isResending && <Spinner aria-hidden="true" />}
           {isResending ? 'Sending...' : 'Resend verification email'}
         </button>
       )}

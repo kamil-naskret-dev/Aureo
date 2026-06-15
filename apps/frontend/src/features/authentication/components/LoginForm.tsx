@@ -33,7 +33,9 @@ export const LoginForm = () => {
       if (err instanceof ApiError && err.statusCode === 403) {
         setUnverifiedEmail(data.email);
       } else {
-        form.setError('root', { message: (err as Error).message });
+        form.setError('root', {
+          message: err instanceof Error ? err.message : 'Something went wrong',
+        });
       }
     }
   };
@@ -83,7 +85,7 @@ export const LoginForm = () => {
         />
       </FieldGroup>
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting && <Spinner />}
+        {isSubmitting && <Spinner aria-hidden="true" />}
         {isSubmitting ? 'Logging in...' : 'Log in'}
       </Button>
     </form>

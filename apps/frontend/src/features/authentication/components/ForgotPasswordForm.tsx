@@ -27,7 +27,9 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
       await forgotPassword(data);
       onSuccess(data.email);
     } catch (err) {
-      form.setError('root', { message: (err as Error).message });
+      form.setError('root', {
+        message: err instanceof Error ? err.message : 'Something went wrong',
+      });
     }
   };
 
@@ -57,7 +59,7 @@ export const ForgotPasswordForm = ({ onSuccess }: ForgotPasswordFormProps) => {
         />
       </FieldGroup>
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting && <Spinner />}
+        {isSubmitting && <Spinner aria-hidden="true" />}
         {isSubmitting ? 'Sending...' : 'Send reset link'}
       </Button>
     </form>

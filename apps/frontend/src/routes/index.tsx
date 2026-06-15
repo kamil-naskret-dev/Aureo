@@ -18,7 +18,7 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-custom-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <Logo className="mb-8" />
+          <Logo className="mb-8" aria-label="Aureo" role="img" />
           <div className="flex flex-col gap-1.5">
             <CardTitle>Log in to your account</CardTitle>
             <CardDescription>Welcome back! Please enter your details.</CardDescription>

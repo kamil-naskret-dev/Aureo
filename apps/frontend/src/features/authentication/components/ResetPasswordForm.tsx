@@ -28,7 +28,9 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
       await resetPassword({ token, password: data.password });
       onSuccess();
     } catch (err) {
-      form.setError('root', { message: (err as Error).message });
+      form.setError('root', {
+        message: err instanceof Error ? err.message : 'Something went wrong',
+      });
     }
   };
 
@@ -81,7 +83,7 @@ export const ResetPasswordForm = ({ token, onSuccess }: ResetPasswordFormProps) 
         />
       </FieldGroup>
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting && <Spinner />}
+        {isSubmitting && <Spinner aria-hidden="true" />}
         {isSubmitting ? 'Resetting...' : 'Reset password'}
       </Button>
     </form>

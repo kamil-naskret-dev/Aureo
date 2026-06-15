@@ -8,14 +8,11 @@ import { SearchProvider } from '../../features/bookmarks/context/SearchContext';
 import { AddBookmarkModal } from '../../features/bookmarks/components/AddBookmarkModal';
 import { DashboardNav } from '../../features/bookmarks/components/DashboardNav';
 import { Sidebar } from '../../features/bookmarks/components/Sidebar';
-import { useUser } from '../../store/auth.store';
-
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardLayout,
 });
 
 function DashboardLayout() {
-  const user = useUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,14 +24,14 @@ function DashboardLayout() {
             <Sidebar className="hidden lg:flex" />
 
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-              <SheetContent side="left" className="w-full max-w-74 p-0">
+              <SheetContent id="mobile-sidebar" side="left" className="w-full max-w-74 p-0">
                 <Sidebar className="flex h-full w-full border-r-0" />
               </SheetContent>
             </Sheet>
 
             <div className="flex flex-1 flex-col overflow-hidden">
               <DashboardNav
-                user={user}
+                isSidebarOpen={isSidebarOpen}
                 onMenuClick={() => setIsSidebarOpen(true)}
                 onAddBookmark={() => setIsModalOpen(true)}
               />

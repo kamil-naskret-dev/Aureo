@@ -1,17 +1,16 @@
 import { Button, Input } from '@aureo/ui';
 import { Menu, Plus, Search } from 'lucide-react';
 
-import { AuthUser } from '../../authentication/types/auth.types';
 import { useSearch } from '../context/SearchContext';
 import { UserDropdown } from './UserDropdown';
 
 type DashboardNavProps = {
-  user: AuthUser;
   onMenuClick: () => void;
   onAddBookmark: () => void;
+  isSidebarOpen: boolean;
 };
 
-export const DashboardNav = ({ user, onMenuClick, onAddBookmark }: DashboardNavProps) => {
+export const DashboardNav = ({ onMenuClick, onAddBookmark, isSidebarOpen }: DashboardNavProps) => {
   const { searchQuery, setSearchQuery } = useSearch();
 
   return (
@@ -22,8 +21,10 @@ export const DashboardNav = ({ user, onMenuClick, onAddBookmark }: DashboardNavP
         onClick={onMenuClick}
         className="size-11 shrink-0 text-custom-neutral-600 lg:hidden dark:text-white dark:bg-custom-neutral-800"
         aria-label="Open menu"
+        aria-expanded={isSidebarOpen}
+        aria-controls="mobile-sidebar"
       >
-        <Menu className="size-5" />
+        <Menu className="size-5" aria-hidden="true" />
       </Button>
 
       <div className="relative min-w-0 flex-1 max-w-[320px]">
@@ -45,7 +46,7 @@ export const DashboardNav = ({ user, onMenuClick, onAddBookmark }: DashboardNavP
           <Plus className="size-5" aria-hidden="true" />
           <span className="hidden sm:inline">Add Bookmark</span>
         </Button>
-        <UserDropdown user={user} />
+        <UserDropdown />
       </div>
     </header>
   );

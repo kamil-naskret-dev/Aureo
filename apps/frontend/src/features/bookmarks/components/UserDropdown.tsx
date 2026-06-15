@@ -14,11 +14,8 @@ import { LogOut, Palette } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
 import { useLogout } from '../../authentication/hooks/useLogout';
 import { AuthUser } from '../../authentication/types/auth.types';
+import { useUser } from '../../../store/auth.store';
 import { ThemeToggle } from './ThemeToggle';
-
-type UserDropdownProps = {
-  user: AuthUser;
-};
 
 const UserAvatar = ({ user }: { user: AuthUser }) => {
   const initials = user.name
@@ -35,7 +32,8 @@ const UserAvatar = ({ user }: { user: AuthUser }) => {
   );
 };
 
-export const UserDropdown = ({ user }: UserDropdownProps) => {
+export const UserDropdown = () => {
+  const user = useUser();
   const { mutate: logout, isPending } = useLogout();
   const { isDark, toggleTheme } = useTheme();
 
@@ -95,7 +93,11 @@ export const UserDropdown = ({ user }: UserDropdownProps) => {
             disabled={isPending}
             className="text-custom-neutral-800 dark:text-custom-neutral-100"
           >
-            {isPending ? <Spinner className="size-4" /> : <LogOut />}
+            {isPending ? (
+              <Spinner className="size-4" aria-hidden="true" />
+            ) : (
+              <LogOut aria-hidden="true" />
+            )}
             {isPending ? 'Logging out...' : 'Logout'}
           </DropdownMenuItem>
         </div>

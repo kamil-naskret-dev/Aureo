@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 
 import { useBookmarkActions } from '../hooks/useBookmarkActions';
 import { BookmarkResponse } from '../types/bookmark.types';
+import { isSafeUrl } from '../utils/isSafeUrl';
 
 type BookmarkCardMenuProps = {
   bookmark: BookmarkResponse;
@@ -63,8 +64,12 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem asChild>
-            <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
+          <DropdownMenuItem asChild disabled={!isSafeUrl(bookmark.url)}>
+            <a
+              href={isSafeUrl(bookmark.url) ? bookmark.url : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <SquareArrowOutUpRight aria-hidden="true" />
               Visit
             </a>

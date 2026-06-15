@@ -27,7 +27,9 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       await register(data);
       onSuccess(data.email);
     } catch (err) {
-      form.setError('root', { message: (err as Error).message });
+      form.setError('root', {
+        message: err instanceof Error ? err.message : 'Something went wrong',
+      });
     }
   };
 
@@ -85,7 +87,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         />
       </FieldGroup>
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting && <Spinner />}
+        {isSubmitting && <Spinner aria-hidden="true" />}
         {isSubmitting ? 'Creating account...' : 'Create account'}
       </Button>
     </form>

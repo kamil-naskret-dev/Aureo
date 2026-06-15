@@ -29,9 +29,9 @@ export const TagsOrchestrator = ({ archived, activeTags, onToggleTag }: TagsOrch
   if (!tags?.length) return <TagsEmpty />;
 
   return (
-    <>
+    <ul aria-label="Filter by tag">
       {tags.map((tag) => (
-        <div key={tag.name} className="py-0.5">
+        <li key={tag.name} className="py-0.5">
           <label className="flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors">
             <Checkbox
               checked={activeTags.has(tag.name)}
@@ -46,8 +46,8 @@ export const TagsOrchestrator = ({ archived, activeTags, onToggleTag }: TagsOrch
               </span>
             </div>
           </label>
-        </div>
+        </li>
       ))}
-    </>
+    </ul>
   );
 };
