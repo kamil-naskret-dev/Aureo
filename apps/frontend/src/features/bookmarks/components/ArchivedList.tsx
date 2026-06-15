@@ -5,8 +5,8 @@ import {
   DropdownMenuTrigger,
 } from '@aureo/ui';
 import { ArrowDownUp, Check } from 'lucide-react';
+import { useState } from 'react';
 
-import { useDashboard } from '../context/DashboardContext';
 import { useSearch } from '../context/SearchContext';
 import { SortOption } from '../types/bookmark.types';
 import { BookmarksOrchestrator } from './BookmarksOrchestrator';
@@ -17,16 +17,20 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'most-visited', label: 'Most visited' },
 ];
 
-export const BookmarksList = () => {
+export const ArchivedList = () => {
   const { searchQuery } = useSearch();
-  const { activeTags, sortBy, setSortBy, page, setPage } = useDashboard();
+  const [sortBy, setSortBy] = useState<SortOption>('recently-added');
+  const [page, setPage] = useState(1);
+
+  const handleSetSortBy = (sort: SortOption) => {
+    setSortBy(sort);
+    setPage(1);
+  };
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-custom-neutral-900 dark:text-white">
-          All Bookmarks
-        </h1>
+        <h1 className="text-lg font-semibold text-custom-neutral-900 dark:text-white">Archived</h1>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -43,7 +47,7 @@ export const BookmarksList = () => {
             {SORT_OPTIONS.map((opt) => (
               <DropdownMenuItem
                 key={opt.value}
-                onSelect={() => setSortBy(opt.value)}
+                onSelect={() => handleSetSortBy(opt.value)}
                 className="justify-between text-custom-neutral-800 dark:text-custom-neutral-100"
               >
                 {opt.label}
@@ -56,11 +60,11 @@ export const BookmarksList = () => {
 
       <BookmarksOrchestrator
         searchQuery={searchQuery}
-        activeTags={activeTags}
+        activeTags={new Set()}
         sortBy={sortBy}
         page={page}
         onPageChange={setPage}
-        archived={false}
+        archived={true}
       />
     </div>
   );

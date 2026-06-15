@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_authenticated/dashboard/archived')({
-  component: ArchivedPage,
-});
+import { ArchivedList } from '../../features/bookmarks/components/ArchivedList';
 
-function ArchivedPage() {
-  return null;
-}
+export const Route = createFileRoute('/_authenticated/dashboard/archived')({
+  component: ArchivedList,
+});

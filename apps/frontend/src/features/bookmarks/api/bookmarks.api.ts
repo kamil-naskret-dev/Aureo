@@ -9,6 +9,7 @@ export const fetchBookmarks = async (query: BookmarksQuery): Promise<PaginatedBo
   if (query.sort) params.set('sort', query.sort);
   if (query.page) params.set('page', String(query.page));
   if (query.limit) params.set('limit', String(query.limit));
+  if (query.archived !== undefined) params.set('archived', String(query.archived));
   query.tags?.forEach((tag) => params.append('tags', tag));
 
   const response = await http.get<ApiEnvelope<PaginatedBookmarks>>('/api/bookmarks', { params });

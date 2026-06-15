@@ -3,8 +3,6 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 import { SortOption } from '../types/bookmark.types';
 
 type DashboardContextValue = {
-  searchQuery: string;
-  setSearchQuery: (q: string) => void;
   activeTags: Set<string>;
   toggleTag: (tag: string) => void;
   sortBy: SortOption;
@@ -16,7 +14,6 @@ type DashboardContextValue = {
 const DashboardContext = createContext<DashboardContextValue | null>(null);
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortOption>('recently-added');
   const [page, setPage] = useState(1);
@@ -34,11 +31,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     setPage(1);
   };
 
-  const handleSetSearchQuery = (q: string) => {
-    setSearchQuery(q);
-    setPage(1);
-  };
-
   const handleSetSortBy = (sort: SortOption) => {
     setSortBy(sort);
     setPage(1);
@@ -47,8 +39,6 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   return (
     <DashboardContext.Provider
       value={{
-        searchQuery,
-        setSearchQuery: handleSetSearchQuery,
         activeTags,
         toggleTag,
         sortBy,

@@ -37,13 +37,13 @@ export class BookmarkQueryDto {
   @ApiPropertyOptional({ default: false })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ obj, key }) => obj[key] === 'true')
   archived?: boolean;
 
   @ApiPropertyOptional({ default: false })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ obj, key }) => obj[key] === 'true')
   pinned?: boolean;
 
   @ApiPropertyOptional({

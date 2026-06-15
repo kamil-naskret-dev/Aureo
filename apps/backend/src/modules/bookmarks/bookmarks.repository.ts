@@ -205,21 +205,15 @@ export class BookmarksRepository {
     }
 
     if (filters.archived !== undefined) {
-      conditions.push(Prisma.sql`EXISTS (
-        SELECT 1 FROM "UserBookmarkState" s
-        WHERE s."bookmarkId" = b.id
-        AND s."userId" = ${userId}
-        AND s.archived = ${filters.archived}
-      )`);
+      conditions.push(
+        Prisma.sql`COALESCE(ubs.archived, false) = ${filters.archived}`,
+      );
     }
 
     if (filters.pinned !== undefined) {
-      conditions.push(Prisma.sql`EXISTS (
-        SELECT 1 FROM "UserBookmarkState" s
-        WHERE s."bookmarkId" = b.id
-        AND s."userId" = ${userId}
-        AND s.pinned = ${filters.pinned}
-      )`);
+      conditions.push(
+        Prisma.sql`COALESCE(ubs.pinned, false) = ${filters.pinned}`,
+      );
     }
 
     return conditions;

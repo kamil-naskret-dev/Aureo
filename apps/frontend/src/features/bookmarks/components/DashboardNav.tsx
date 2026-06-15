@@ -2,7 +2,7 @@ import { Button, Input } from '@aureo/ui';
 import { Menu, Plus, Search } from 'lucide-react';
 
 import { AuthUser } from '../../authentication/types/auth.types';
-import { useDashboard } from '../context/DashboardContext';
+import { useSearch } from '../context/SearchContext';
 import { UserDropdown } from './UserDropdown';
 
 type DashboardNavProps = {
@@ -12,15 +12,15 @@ type DashboardNavProps = {
 };
 
 export const DashboardNav = ({ user, onMenuClick, onAddBookmark }: DashboardNavProps) => {
-  const { searchQuery, setSearchQuery } = useDashboard();
+  const { searchQuery, setSearchQuery } = useSearch();
 
   return (
-    <header className="flex items-center gap-3 border-b border-custom-neutral-300 bg-white dark:bg-custom-neutral-800 py-3 px-4 sm:px-8 sm:py-4 dark:border-custom-neutral-500 ">
+    <header className="flex items-center gap-3 border-b border-custom-neutral-300 bg-white dark:bg-custom-neutral-800 py-3 px-4 sm:px-8 sm:py-4 dark:border-custom-neutral-500">
       <Button
         variant="ghost"
         size="icon"
         onClick={onMenuClick}
-        className="size-11 shrink-0 text-custom-neutral-600 lg:hidden dark:text-white dark:bg-custom-neutral-800 "
+        className="size-11 shrink-0 text-custom-neutral-600 lg:hidden dark:text-white dark:bg-custom-neutral-800"
         aria-label="Open menu"
       >
         <Menu className="size-5" />
