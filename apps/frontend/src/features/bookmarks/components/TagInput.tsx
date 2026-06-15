@@ -67,7 +67,7 @@ export const TagInput = ({ value, onChange, id, 'aria-invalid': ariaInvalid }: T
             type="button"
             onClick={() => removeTag(tag)}
             aria-label={`Remove tag ${tag}`}
-            className="text-custom-neutral-400 hover:text-custom-neutral-700 dark:hover:text-white focus:outline-none"
+            className="text-custom-neutral-400 hover:text-custom-neutral-700 dark:hover:text-white rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-custom-primary-700 dark:focus-visible:ring-custom-neutral-100"
           >
             <X className="size-3" />
           </button>
@@ -85,9 +85,16 @@ export const TagInput = ({ value, onChange, id, 'aria-invalid': ariaInvalid }: T
           onPaste={handlePaste}
           placeholder={value.length === 0 ? 'Type a tag and press Enter...' : ''}
           aria-invalid={ariaInvalid}
+          aria-describedby={id ? `${id}-hint` : undefined}
           maxLength={MAX_TAG_LENGTH}
           className="flex-1 min-w-24 bg-transparent outline-none placeholder:text-custom-neutral-400 dark:placeholder:text-custom-neutral-300 text-custom-neutral-900 dark:text-white"
         />
+      )}
+      {id && (
+        <span id={`${id}-hint`} className="sr-only">
+          Press Enter or comma to add a tag. Press Backspace to remove the last tag. Maximum{' '}
+          {MAX_TAGS} tags.
+        </span>
       )}
     </div>
   );

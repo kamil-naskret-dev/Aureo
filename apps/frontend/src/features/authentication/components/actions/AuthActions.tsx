@@ -13,9 +13,9 @@ type AuthActionsProps = {
 export function AuthActions({ actions }: AuthActionsProps) {
   return (
     <div className="flex flex-col gap-3 items-center">
-      {actions.map((action, index) => (
+      {actions.map((action) => (
         <p
-          key={index}
+          key={action.to}
           className="flex text-custom-neutral-800 text-sm font-medium tracking-[1%] leading-[150%] dark:text-custom-neutral-100 items-center"
         >
           {action.label}

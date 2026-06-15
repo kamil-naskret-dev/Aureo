@@ -1,35 +1,16 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext } from 'react';
 
-type ArchivedContextValue = {
-  activeTags: Set<string>;
-  toggleTag: (tag: string) => void;
-};
+import { BookmarkListState, useBookmarkListState } from '../hooks/useBookmarkListState';
 
-const ArchivedContext = createContext<ArchivedContextValue | null>(null);
+const ArchivedContext = createContext<BookmarkListState | null>(null);
 
 export const ArchivedProvider = ({ children }: { children: ReactNode }) => {
-  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
+  const state = useBookmarkListState();
 
-  const toggleTag = (tag: string) => {
-    setActiveTags((prev) => {
-      const next = new Set(prev);
-      if (next.has(tag)) {
-        next.delete(tag);
-      } else {
-        next.add(tag);
-      }
-      return next;
-    });
-  };
-
-  return (
-    <ArchivedContext.Provider value={{ activeTags, toggleTag }}>
-      {children}
-    </ArchivedContext.Provider>
-  );
+  return <ArchivedContext.Provider value={state}>{children}</ArchivedContext.Provider>;
 };
 
-export const useArchived = () => {
+export const useArchived = (): BookmarkListState => {
   const ctx = useContext(ArchivedContext);
   if (!ctx) throw new Error('useArchived must be used within ArchivedProvider');
   return ctx;

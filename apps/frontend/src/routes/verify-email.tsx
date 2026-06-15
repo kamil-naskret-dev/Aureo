@@ -28,7 +28,9 @@ function VerifyEmailPage() {
 
   const errorMessage = !token
     ? 'Verification link is invalid or missing a token.'
-    : ((error as Error)?.message ?? 'Something went wrong. Please try again.');
+    : error instanceof Error
+      ? error.message
+      : 'Something went wrong. Please try again.';
 
   const statusComponents: Record<StatusKey, ReactNode> = {
     loading: <VerifyEmailLoading />,
@@ -40,7 +42,7 @@ function VerifyEmailPage() {
     <div className="flex min-h-screen items-center justify-center bg-custom-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <Logo className="mb-8" />
+          <Logo className="mb-8" aria-label="Aureo" role="img" />
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4 text-center">
           {statusComponents[statusKey]}

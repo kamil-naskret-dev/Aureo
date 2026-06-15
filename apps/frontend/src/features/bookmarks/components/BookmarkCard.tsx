@@ -5,9 +5,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@aureo/ui';
-import { Archive, Calendar, Clock, Eye, Pin } from 'lucide-react';
+import { Archive, Calendar, Clock, Eye, Globe, Pin } from 'lucide-react';
+import { useState } from 'react';
 
 import { BookmarkResponse } from '../types/bookmark.types';
+import { isSafeUrl } from '../utils/isSafeUrl';
 import { BookmarkCardMenu } from './BookmarkCardMenu';
 
 type BookmarkCardProps = {
@@ -18,29 +20,47 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${bookmark.domain}&sz=48`;
   const isPinned = bookmark.state?.pinned ?? false;
   const isArchived = bookmark.state?.archived ?? false;
+  const [showFallback, setShowFallback] = useState(false);
 
   return (
     <div className="min-h-76 flex flex-col rounded-[12px] bg-white dark:bg-custom-neutral-800 shadow-[0_2px_4px_0px_#1515150F]">
       <div className="p-4 flex flex-col gap-4 grow">
         <div className="flex items-start gap-3">
           <div className="border border-neutral-custom-100 rounded-[8px] p-1 dark:border-custom-neutral-500">
-            <img
-              src={faviconUrl}
-              alt={bookmark.domain}
-              width={44}
-              height={44}
-              className="size-11 shrink-0 rounded-sm"
-            />
+            {showFallback ? (
+              <Globe
+                className="size-11 shrink-0 text-custom-neutral-400 dark:text-custom-neutral-100"
+                aria-hidden="true"
+              />
+            ) : (
+              <img
+                src={faviconUrl}
+                alt={bookmark.domain}
+                width={44}
+                height={44}
+                className="size-11 shrink-0 rounded-sm"
+                onLoad={(e) => {
+                  if (e.currentTarget.naturalWidth <= 16) setShowFallback(true);
+                }}
+                onError={() => setShowFallback(true)}
+              />
+            )}
           </div>
           <div className="min-w-0 flex-1 flex flex-col gap-1">
-            <a
-              href={bookmark.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
-            >
-              {bookmark.title}
-            </a>
+            {isSafeUrl(bookmark.url) ? (
+              <a
+                href={bookmark.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
+              >
+                {bookmark.title}
+              </a>
+            ) : (
+              <span className="line-clamp-1 text-xl font-bold text-custom-neutral-900 dark:text-white">
+                {bookmark.title}
+              </span>
+            )}
             <p className="line-clamp-1 text-xs font-medium leading-[140%] text-custom-neutral-800 dark:text-custom-neutral-100">
               {bookmark.domain}
             </p>

@@ -198,7 +198,7 @@ export const AddBookmarkModal = ({ open, onOpenChange }: AddBookmarkModalProps) 
               Cancel
             </Button>
             <Button type="submit" size="lg" className="flex-1" disabled={isPending}>
-              {isPending && <Spinner />}
+              {isPending && <Spinner aria-hidden="true" />}
               {isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
