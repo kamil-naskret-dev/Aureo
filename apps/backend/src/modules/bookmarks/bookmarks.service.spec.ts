@@ -30,6 +30,10 @@ const repoMock = {
   delete: jest.fn(),
   upsertState: jest.fn(),
   getState: jest.fn(),
+  atomicTogglePin: jest.fn(),
+  atomicToggleArchive: jest.fn(),
+  incrementViews: jest.fn(),
+  findUserTags: jest.fn(),
 };
 
 describe('BookmarksService', () => {
@@ -166,35 +170,39 @@ describe('BookmarksService', () => {
     });
   });
 
-  describe('togglePin', () => {
-    it('pins an unpinned bookmark', async () => {
+  describe('recordView', () => {
+    it('increments views when bookmark exists', async () => {
       repoMock.findById.mockResolvedValue(makeBookmarkWithRelations());
-      repoMock.getState.mockResolvedValue(null);
-      repoMock.upsertState.mockResolvedValue(undefined);
-      repoMock.findById
-        .mockResolvedValueOnce(makeBookmarkWithRelations())
-        .mockResolvedValueOnce(makeBookmarkWithRelations());
+      repoMock.incrementViews.mockResolvedValue(undefined);
 
-      await service.togglePin(USER_ID, BOOKMARK_ID);
+      await service.recordView(USER_ID, BOOKMARK_ID);
 
-      expect(repoMock.upsertState).toHaveBeenCalledWith(
-        USER_ID,
+      expect(repoMock.incrementViews).toHaveBeenCalledWith(
         BOOKMARK_ID,
-        expect.objectContaining({ pinned: true }),
+        USER_ID,
       );
     });
 
-    it('unpins a pinned bookmark', async () => {
+    it('throws BookmarkNotFoundException when bookmark does not exist', async () => {
+      repoMock.findById.mockResolvedValue(null);
+
+      await expect(service.recordView(USER_ID, BOOKMARK_ID)).rejects.toThrow(
+        BookmarkNotFoundException,
+      );
+      expect(repoMock.incrementViews).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('togglePin', () => {
+    it('calls atomicTogglePin and returns updated bookmark', async () => {
       repoMock.findById.mockResolvedValue(makeBookmarkWithRelations());
-      repoMock.getState.mockResolvedValue({ pinned: true, archived: false });
-      repoMock.upsertState.mockResolvedValue(undefined);
+      repoMock.atomicTogglePin.mockResolvedValue(undefined);
 
       await service.togglePin(USER_ID, BOOKMARK_ID);
 
-      expect(repoMock.upsertState).toHaveBeenCalledWith(
+      expect(repoMock.atomicTogglePin).toHaveBeenCalledWith(
         USER_ID,
         BOOKMARK_ID,
-        expect.objectContaining({ pinned: false }),
       );
     });
 
@@ -204,35 +212,20 @@ describe('BookmarksService', () => {
       await expect(service.togglePin(USER_ID, BOOKMARK_ID)).rejects.toThrow(
         BookmarkNotFoundException,
       );
+      expect(repoMock.atomicTogglePin).not.toHaveBeenCalled();
     });
   });
 
   describe('toggleArchive', () => {
-    it('archives an unarchived bookmark', async () => {
+    it('calls atomicToggleArchive and returns updated bookmark', async () => {
       repoMock.findById.mockResolvedValue(makeBookmarkWithRelations());
-      repoMock.getState.mockResolvedValue(null);
-      repoMock.upsertState.mockResolvedValue(undefined);
+      repoMock.atomicToggleArchive.mockResolvedValue(undefined);
 
       await service.toggleArchive(USER_ID, BOOKMARK_ID);
 
-      expect(repoMock.upsertState).toHaveBeenCalledWith(
+      expect(repoMock.atomicToggleArchive).toHaveBeenCalledWith(
         USER_ID,
         BOOKMARK_ID,
-        expect.objectContaining({ archived: true }),
-      );
-    });
-
-    it('unarchives an archived bookmark', async () => {
-      repoMock.findById.mockResolvedValue(makeBookmarkWithRelations());
-      repoMock.getState.mockResolvedValue({ pinned: false, archived: true });
-      repoMock.upsertState.mockResolvedValue(undefined);
-
-      await service.toggleArchive(USER_ID, BOOKMARK_ID);
-
-      expect(repoMock.upsertState).toHaveBeenCalledWith(
-        USER_ID,
-        BOOKMARK_ID,
-        expect.objectContaining({ archived: false }),
       );
     });
 
@@ -242,6 +235,7 @@ describe('BookmarksService', () => {
       await expect(service.toggleArchive(USER_ID, BOOKMARK_ID)).rejects.toThrow(
         BookmarkNotFoundException,
       );
+      expect(repoMock.atomicToggleArchive).not.toHaveBeenCalled();
     });
   });
 });

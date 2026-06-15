@@ -10,7 +10,7 @@ import {
 
 export class CreateBookmarkDto {
   @ApiProperty({ example: 'https://example.com' })
-  @IsUrl()
+  @IsUrl({ require_protocol: true, protocols: ['http', 'https'] })
   @MaxLength(1000)
   url!: string;
 
@@ -22,7 +22,7 @@ export class CreateBookmarkDto {
   @ApiPropertyOptional({ example: 'A short description' })
   @IsOptional()
   @IsString()
-  @MaxLength(5000)
+  @MaxLength(300)
   description?: string;
 
   @ApiPropertyOptional({ example: ['typescript', 'nestjs'] })

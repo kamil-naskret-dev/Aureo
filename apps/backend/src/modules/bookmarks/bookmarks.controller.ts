@@ -110,6 +110,18 @@ export class BookmarksController {
     return this.bookmarksService.delete(user.sub, id);
   }
 
+  @Post(':id/view')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Record a view for a bookmark' })
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({ description: 'Bookmark not found.' })
+  recordView(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ): Promise<void> {
+    return this.bookmarksService.recordView(user.sub, id);
+  }
+
   @Patch(':id/pin')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Toggle pin on a bookmark' })

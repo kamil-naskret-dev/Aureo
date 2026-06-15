@@ -8,6 +8,7 @@ import {
   deleteBookmarkApi,
   toggleArchiveApi,
   togglePinApi,
+  updateBookmarkApi,
 } from '../api/bookmarks.api';
 
 export const useBookmarkActions = () => {
@@ -74,5 +75,20 @@ export const useBookmarkActions = () => {
     },
   });
 
-  return { pin, archive, remove, create };
+  const update = useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { title?: string; description?: string; tags?: string[] };
+    }) => updateBookmarkApi(id, data),
+    onSuccess: () => {
+      toast.success('Bookmark updated.');
+      invalidate();
+    },
+    onError: () => toast.error('Failed to update bookmark'),
+  });
+
+  return { pin, archive, remove, create, update };
 };

@@ -75,7 +75,8 @@ export class BookmarksRepository {
       include: { tags: { include: { tag: true } }, userStates: true },
     });
 
-    const data = ids.map((id) => unsorted.find((b) => b.id === id)!);
+    const bookmarkMap = new Map(unsorted.map((b) => [b.id, b]));
+    const data = ids.map((id) => bookmarkMap.get(id)!);
 
     return { data, total };
   }
@@ -151,6 +152,13 @@ export class BookmarksRepository {
     return this.prisma.bookmark.delete({ where: { id, userId } });
   }
 
+  async incrementViews(id: string, userId: string): Promise<void> {
+    await this.prisma.bookmark.updateMany({
+      where: { id, userId },
+      data: { views: { increment: 1 } },
+    });
+  }
+
   async upsertState(
     userId: string,
     bookmarkId: string,
@@ -172,6 +180,28 @@ export class BookmarksRepository {
     return this.prisma.userBookmarkState.findUnique({
       where: { userId_bookmarkId: { userId, bookmarkId } },
     });
+  }
+
+  async atomicTogglePin(userId: string, bookmarkId: string): Promise<void> {
+    await this.prisma.$executeRaw`
+      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt")
+      VALUES (${userId}, ${bookmarkId}, true, NOW(), false, NULL)
+      ON CONFLICT ("userId", "bookmarkId")
+      DO UPDATE SET
+        "pinned"    = NOT "UserBookmarkState"."pinned",
+        "pinnedAt"  = CASE WHEN NOT "UserBookmarkState"."pinned" THEN NOW() ELSE NULL END
+    `;
+  }
+
+  async atomicToggleArchive(userId: string, bookmarkId: string): Promise<void> {
+    await this.prisma.$executeRaw`
+      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt")
+      VALUES (${userId}, ${bookmarkId}, false, NULL, true, NOW())
+      ON CONFLICT ("userId", "bookmarkId")
+      DO UPDATE SET
+        "archived"   = NOT "UserBookmarkState"."archived",
+        "archivedAt" = CASE WHEN NOT "UserBookmarkState"."archived" THEN NOW() ELSE NULL END
+    `;
   }
 
   async findUserTags(

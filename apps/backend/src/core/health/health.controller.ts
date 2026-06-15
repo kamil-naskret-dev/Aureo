@@ -7,6 +7,7 @@ import {
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
 
+import { Public } from '../../common/decorators/public.decorator.js';
 import { SWAGGER_TAGS } from '../../common/constants/swagger.constants.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
@@ -21,6 +22,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @Public()
   @HealthCheck()
   @ApiOperation({ summary: 'Check system health' })
   check() {
