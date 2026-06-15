@@ -31,4 +31,5 @@ export type BookmarksQuery = {
   sort?: SortOption;
   page?: number;
   limit?: number;
+  archived?: boolean;
 };

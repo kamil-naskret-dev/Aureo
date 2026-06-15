@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@aureo/ui';
-import { Calendar, Clock, Eye, Pin } from 'lucide-react';
+import { Archive, Calendar, Clock, Eye, Pin } from 'lucide-react';
 
 import { BookmarkResponse } from '../types/bookmark.types';
 import { BookmarkCardMenu } from './BookmarkCardMenu';
@@ -17,6 +17,7 @@ type BookmarkCardProps = {
 export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${bookmark.domain}&sz=48`;
   const isPinned = bookmark.state?.pinned ?? false;
+  const isArchived = bookmark.state?.archived ?? false;
 
   return (
     <div className="min-h-76 flex flex-col rounded-[12px] bg-white dark:bg-custom-neutral-800 shadow-[0_2px_4px_0px_#1515150F]">
@@ -115,9 +116,26 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
               })}
             </span>
           </li>
+          {isArchived && (
+            <li
+              className="ml-auto flex items-center gap-1 rounded-[4px] bg-custom-neutral-100 px-2 py-0.5 dark:bg-custom-neutral-600"
+              aria-label="Archived"
+            >
+              <Archive
+                className="size-3 shrink-0 text-custom-neutral-800 dark:text-custom-neutral-100"
+                aria-hidden="true"
+              />
+              <span className="text-xs font-medium leading-[140%] text-custom-neutral-800 dark:text-custom-neutral-100">
+                Archived
+              </span>
+            </li>
+          )}
           {isPinned && (
-            <li className="ml-auto" aria-label="Pinned">
-              <Pin className="size-3.5" aria-hidden="true" />
+            <li className={isArchived ? '' : 'ml-auto'} aria-label="Pinned">
+              <Pin
+                className="size-3.5 text-custom-neutral-800 dark:text-custom-neutral-100"
+                aria-hidden="true"
+              />
             </li>
           )}
         </ul>

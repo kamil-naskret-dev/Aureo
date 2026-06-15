@@ -1,10 +1,19 @@
 import { Pagination } from '@aureo/ui';
 import { useMemo } from 'react';
 
-import { useDashboard } from '../context/DashboardContext';
 import { BOOKMARKS_LIMIT, useBookmarks } from '../hooks/useBookmarks';
+import { SortOption } from '../types/bookmark.types';
 import { BookmarkCard } from './BookmarkCard';
 import { BookmarksGridSkeleton } from './BookmarkCardSkeleton';
+
+type BookmarksOrchestratorProps = {
+  searchQuery: string;
+  activeTags: Set<string>;
+  sortBy: SortOption;
+  page: number;
+  onPageChange: (page: number) => void;
+  archived?: boolean;
+};
 
 const BookmarksError = () => (
   <div className="flex flex-col items-center gap-2 py-20 text-center">
@@ -24,9 +33,14 @@ const BookmarksEmpty = () => (
   </div>
 );
 
-export const BookmarksOrchestrator = () => {
-  const { searchQuery, activeTags, sortBy, page, setPage } = useDashboard();
-
+export const BookmarksOrchestrator = ({
+  searchQuery,
+  activeTags,
+  sortBy,
+  page,
+  onPageChange,
+  archived,
+}: BookmarksOrchestratorProps) => {
   const query = useMemo(
     () => ({
       search: searchQuery || undefined,
@@ -34,8 +48,9 @@ export const BookmarksOrchestrator = () => {
       sort: sortBy,
       page,
       limit: BOOKMARKS_LIMIT,
+      archived,
     }),
-    [searchQuery, activeTags, sortBy, page],
+    [searchQuery, activeTags, sortBy, page, archived],
   );
 
   const { data, isLoading, isError } = useBookmarks(query);
@@ -56,7 +71,7 @@ export const BookmarksOrchestrator = () => {
         ))}
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
     </>
   );
 };
