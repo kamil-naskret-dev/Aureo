@@ -23,10 +23,14 @@ import { SWAGGER_TAGS } from '../../common/constants/swagger.constants';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { type JwtPayload } from '../../common/types/jwt-payload.type';
 import { BookmarksService } from './bookmarks.service';
-import { BookmarkQueryDto } from './dto/bookmark-query.dto';
+import {
+  BookmarkQueryDto,
+  BookmarkTagQueryDto,
+} from './dto/bookmark-query.dto';
 import {
   BookmarkResponseDto,
   PaginatedBookmarksDto,
+  TagResponseDto,
 } from './dto/bookmark-response.dto';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
@@ -56,6 +60,17 @@ export class BookmarksController {
     @Query() query: BookmarkQueryDto,
   ): Promise<PaginatedBookmarksDto> {
     return this.bookmarksService.findAll(user.sub, query);
+  }
+
+  @Get('tags')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get tags for current user with bookmark counts' })
+  @ApiOkResponse({ type: [TagResponseDto] })
+  findTags(
+    @CurrentUser() user: JwtPayload,
+    @Query() query: BookmarkTagQueryDto,
+  ): Promise<TagResponseDto[]> {
+    return this.bookmarksService.findTags(user.sub, query.archived);
   }
 
   @Get(':id')
