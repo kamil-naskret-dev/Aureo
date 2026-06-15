@@ -104,18 +104,17 @@ export class BookmarksService {
     return this.bookmarks.findUserTags(userId, archived);
   }
 
-  async togglePin(userId: string, id: string): Promise<BookmarkResponseDto> {
-    const currentState = await this.bookmarks.getState(userId, id);
-    if (currentState === null) {
-      const exists = await this.bookmarks.findById(id, userId);
-      if (!exists) throw new BookmarkNotFoundException();
-    }
+  async recordView(userId: string, id: string): Promise<void> {
+    const bookmark = await this.bookmarks.findById(id, userId);
+    if (!bookmark) throw new BookmarkNotFoundException();
+    await this.bookmarks.incrementViews(id, userId);
+  }
 
-    const pinned = !currentState?.pinned;
-    await this.bookmarks.upsertState(userId, id, {
-      pinned,
-      pinnedAt: pinned ? new Date() : null,
-    });
+  async togglePin(userId: string, id: string): Promise<BookmarkResponseDto> {
+    const bookmark = await this.bookmarks.findById(id, userId);
+    if (!bookmark) throw new BookmarkNotFoundException();
+
+    await this.bookmarks.atomicTogglePin(userId, id);
 
     const updated = await this.bookmarks.findById(id, userId);
     return this.mapToResponse(updated!, userId);
@@ -125,17 +124,10 @@ export class BookmarksService {
     userId: string,
     id: string,
   ): Promise<BookmarkResponseDto> {
-    const currentState = await this.bookmarks.getState(userId, id);
-    if (currentState === null) {
-      const exists = await this.bookmarks.findById(id, userId);
-      if (!exists) throw new BookmarkNotFoundException();
-    }
+    const bookmark = await this.bookmarks.findById(id, userId);
+    if (!bookmark) throw new BookmarkNotFoundException();
 
-    const archived = !currentState?.archived;
-    await this.bookmarks.upsertState(userId, id, {
-      archived,
-      archivedAt: archived ? new Date() : null,
-    });
+    await this.bookmarks.atomicToggleArchive(userId, id);
 
     const updated = await this.bookmarks.findById(id, userId);
     return this.mapToResponse(updated!, userId);

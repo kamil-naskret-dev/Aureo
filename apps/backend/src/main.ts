@@ -101,4 +101,7 @@ async function bootstrap(): Promise<void> {
   await app.listen(appConfig.port);
 }
 
-bootstrap().catch(console.error);
+bootstrap().catch((err) => {
+  console.error('Bootstrap failed:', err);
+  process.exit(1);
+});

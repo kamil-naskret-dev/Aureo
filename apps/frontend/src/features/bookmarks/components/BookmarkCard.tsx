@@ -9,6 +9,7 @@ import { Archive, Calendar, Clock, Eye, Globe, Pin } from 'lucide-react';
 import { useState } from 'react';
 
 import { BookmarkResponse } from '../types/bookmark.types';
+import { recordViewApi } from '../api/bookmarks.api';
 import { isSafeUrl } from '../utils/isSafeUrl';
 import { BookmarkCardMenu } from './BookmarkCardMenu';
 
@@ -53,6 +54,7 @@ export const BookmarkCard = ({ bookmark }: BookmarkCardProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="line-clamp-1 text-xl font-bold text-custom-neutral-900 hover:text-custom-neutral-800 dark:text-white outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-custom-neutral-100 dark:focus-visible:ring-offset-neutral-900"
+                onClick={() => void recordViewApi(bookmark.id)}
               >
                 {bookmark.title}
               </a>

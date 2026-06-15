@@ -58,4 +58,52 @@ describe('App (e2e)', () => {
       });
     });
   });
+
+  describe('Bookmarks — auth protection', () => {
+    const BOOKMARK_ID = 'non-existent-id';
+
+    const protectedEndpoints: Array<{
+      method: 'get' | 'post' | 'patch' | 'delete';
+      path: string;
+    }> = [
+      { method: 'get', path: '/api/bookmarks' },
+      { method: 'post', path: '/api/bookmarks' },
+      { method: 'get', path: '/api/bookmarks/tags' },
+      { method: 'get', path: `/api/bookmarks/${BOOKMARK_ID}` },
+      { method: 'patch', path: `/api/bookmarks/${BOOKMARK_ID}` },
+      { method: 'delete', path: `/api/bookmarks/${BOOKMARK_ID}` },
+      { method: 'patch', path: `/api/bookmarks/${BOOKMARK_ID}/pin` },
+      { method: 'patch', path: `/api/bookmarks/${BOOKMARK_ID}/archive` },
+      { method: 'post', path: `/api/bookmarks/${BOOKMARK_ID}/view` },
+    ];
+
+    it.each(protectedEndpoints)(
+      '$method $path returns 401 without token',
+      async ({ method, path }) => {
+        const res = await request(app.getHttpServer())[method](path);
+        expect(res.status).toBe(401);
+        expect(res.body).toMatchObject({
+          statusCode: 401,
+          error: expect.any(String),
+          message: expect.any(String),
+          timestamp: expect.any(String),
+          path,
+        });
+      },
+    );
+
+    it('returns 401 with malformed Authorization header', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/bookmarks')
+        .set('Authorization', 'InvalidToken');
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 401 with expired/invalid Bearer token', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/bookmarks')
+        .set('Authorization', 'Bearer invalid.jwt.token');
+      expect(res.status).toBe(401);
+    });
+  });
 });
