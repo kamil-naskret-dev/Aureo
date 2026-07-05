@@ -184,23 +184,25 @@ export class BookmarksRepository {
 
   async atomicTogglePin(userId: string, bookmarkId: string): Promise<void> {
     await this.prisma.$executeRaw`
-      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt")
-      VALUES (${userId}, ${bookmarkId}, true, NOW(), false, NULL)
+      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt", "createdAt", "updatedAt")
+      VALUES (${userId}, ${bookmarkId}, true, NOW(), false, NULL, NOW(), NOW())
       ON CONFLICT ("userId", "bookmarkId")
       DO UPDATE SET
         "pinned"    = NOT "UserBookmarkState"."pinned",
-        "pinnedAt"  = CASE WHEN NOT "UserBookmarkState"."pinned" THEN NOW() ELSE NULL END
+        "pinnedAt"  = CASE WHEN NOT "UserBookmarkState"."pinned" THEN NOW() ELSE NULL END,
+        "updatedAt" = NOW()
     `;
   }
 
   async atomicToggleArchive(userId: string, bookmarkId: string): Promise<void> {
     await this.prisma.$executeRaw`
-      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt")
-      VALUES (${userId}, ${bookmarkId}, false, NULL, true, NOW())
+      INSERT INTO "UserBookmarkState" ("userId", "bookmarkId", "pinned", "pinnedAt", "archived", "archivedAt", "createdAt", "updatedAt")
+      VALUES (${userId}, ${bookmarkId}, false, NULL, true, NOW(), NOW(), NOW())
       ON CONFLICT ("userId", "bookmarkId")
       DO UPDATE SET
         "archived"   = NOT "UserBookmarkState"."archived",
-        "archivedAt" = CASE WHEN NOT "UserBookmarkState"."archived" THEN NOW() ELSE NULL END
+        "archivedAt" = CASE WHEN NOT "UserBookmarkState"."archived" THEN NOW() ELSE NULL END,
+        "updatedAt"  = NOW()
     `;
   }
 
