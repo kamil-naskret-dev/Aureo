@@ -37,6 +37,6 @@ export class NotificationsService {
       promises.push(channel.send(recipient, data));
     }
 
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
   }
 }

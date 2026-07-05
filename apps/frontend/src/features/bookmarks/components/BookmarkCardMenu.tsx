@@ -43,6 +43,7 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
   const isPinned = bookmark.state?.pinned ?? false;
   const isArchived = bookmark.state?.archived ?? false;
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isUnarchiveOpen, setIsUnarchiveOpen] = useState(false);
 
   const handleCopyUrl = async () => {
     try {
@@ -55,10 +56,123 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
     }
   };
 
+  const visitItem = (
+    <DropdownMenuItem asChild disabled={!isSafeUrl(bookmark.url)}>
+      <a
+        href={isSafeUrl(bookmark.url) ? bookmark.url : undefined}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => void recordViewApi(bookmark.id)}
+      >
+        <SquareArrowOutUpRight aria-hidden="true" />
+        Visit
+      </a>
+    </DropdownMenuItem>
+  );
+
+  const copyItem = (
+    <DropdownMenuItem onSelect={handleCopyUrl}>
+      <Copy aria-hidden="true" />
+      Copy URL
+    </DropdownMenuItem>
+  );
+
   return (
     <>
       <EditBookmarkModal bookmark={bookmark} open={isEditOpen} onOpenChange={setIsEditOpen} />
-      <AlertDialog>
+
+      {/* Unarchive confirmation */}
+      <AlertDialog open={isUnarchiveOpen} onOpenChange={setIsUnarchiveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Restore bookmark?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="font-semibold text-custom-neutral-900 dark:text-white break-words">
+                {bookmark.title}
+              </span>{' '}
+              will be moved back to your bookmarks.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => archive.mutate({ id: bookmark.id, archived: true })}
+              disabled={archive.isPending}
+            >
+              Restore
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {isArchived ? (
+        /* ── Archived view: Visit, Copy URL, Unarchive, Delete ── */
+        <AlertDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex size-8 border border-custom-neutral-400 items-center justify-center rounded-md text-custom-neutral-400 transition-colors hover:bg-custom-neutral-100 hover:text-custom-neutral-700 dark:hover:bg-custom-neutral-600 dark:hover:text-custom-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-custom-primary-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 dark:focus-visible:ring-custom-neutral-100"
+                aria-label="Bookmark options"
+              >
+                <MoreVertical className="size-5" aria-hidden="true" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-48">
+              {visitItem}
+              {copyItem}
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsUnarchiveOpen(true);
+                }}
+                disabled={archive.isPending}
+              >
+                <ArchiveX aria-hidden="true" />
+                Unarchive
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem
+                  className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trash2 aria-hidden="true" />
+                  Delete
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete bookmark?</AlertDialogTitle>
+              <AlertDialogDescription>
+                <span className="font-semibold text-custom-neutral-900 dark:text-white break-words">
+                  {bookmark.title}
+                </span>{' '}
+                will be permanently deleted. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => remove.mutate(bookmark.id)}
+                disabled={remove.isPending}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : (
+        /* ── Main view: Visit, Copy URL, Pin, Edit, Archive ── */
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -71,22 +185,8 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild disabled={!isSafeUrl(bookmark.url)}>
-              <a
-                href={isSafeUrl(bookmark.url) ? bookmark.url : undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => void recordViewApi(bookmark.id)}
-              >
-                <SquareArrowOutUpRight aria-hidden="true" />
-                Visit
-              </a>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onSelect={handleCopyUrl}>
-              <Copy aria-hidden="true" />
-              Copy URL
-            </DropdownMenuItem>
+            {visitItem}
+            {copyItem}
 
             <DropdownMenuItem onSelect={() => setIsEditOpen(true)}>
               <Pencil aria-hidden="true" />
@@ -104,48 +204,15 @@ export const BookmarkCardMenu = ({ bookmark }: BookmarkCardMenuProps) => {
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onSelect={() => archive.mutate({ id: bookmark.id, archived: isArchived })}
+              onSelect={() => archive.mutate({ id: bookmark.id, archived: false })}
               disabled={archive.isPending}
             >
-              {isArchived ? <ArchiveX aria-hidden="true" /> : <Archive aria-hidden="true" />}
-              {isArchived ? 'Unarchive' : 'Archive'}
+              <Archive aria-hidden="true" />
+              Archive
             </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <AlertDialogTrigger asChild>
-              <DropdownMenuItem
-                className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-                onSelect={(e) => e.preventDefault()}
-              >
-                <Trash2 aria-hidden="true" />
-                Delete
-              </DropdownMenuItem>
-            </AlertDialogTrigger>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete bookmark?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <span className="font-semibold text-custom-neutral-900 dark:text-white break-words">
-                {bookmark.title}
-              </span>{' '}
-              will be permanently deleted. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => remove.mutate(bookmark.id)}
-              disabled={remove.isPending}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      )}
     </>
   );
 };

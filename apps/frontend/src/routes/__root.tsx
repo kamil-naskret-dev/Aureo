@@ -2,6 +2,8 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@aureo/ui';
 
+import { useTheme } from '../hooks/useTheme';
+
 export const Route = createRootRoute({
   beforeLoad: () => {
     document.title = 'Aureo';
@@ -11,6 +13,8 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+  useTheme();
+
   return (
     <div className="min-h-screen bg-custom-background">
       <Outlet />

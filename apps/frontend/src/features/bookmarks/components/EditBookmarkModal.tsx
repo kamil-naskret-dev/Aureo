@@ -2,6 +2,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   Field,
@@ -85,6 +86,9 @@ export const EditBookmarkModal = ({ bookmark, open, onOpenChange }: EditBookmark
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Bookmark</DialogTitle>
+          <DialogDescription>
+            Update your saved link details — change the title, description, URL, or tags anytime.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">

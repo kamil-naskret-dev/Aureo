@@ -28,6 +28,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
 
   return (
     <aside
+      id="mobile-sidebar"
       aria-label="Sidebar navigation"
       className={cn(
         'flex w-full max-w-74 gap-4 shrink-0 flex-col border-r border-custom-neutral-300 bg-white dark:border-custom-neutral-500 dark:bg-custom-neutral-800',

@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useDashboard } from '../context/DashboardContext';
 import { useSearch } from '../context/SearchContext';
 import { BookmarksOrchestrator } from './BookmarksOrchestrator';
@@ -6,6 +8,10 @@ import { SortDropdown } from './SortDropdown';
 export const BookmarksList = () => {
   const { debouncedSearchQuery } = useSearch();
   const { activeTags, sortBy, setSortBy, page, setPage } = useDashboard();
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchQuery, setPage]);
 
   return (
     <div className="flex flex-col gap-6">
