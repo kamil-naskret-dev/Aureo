@@ -23,6 +23,7 @@ export default [
       'no-console': 'warn',
       'no-debugger': 'warn',
       'unused-imports/no-unused-imports': 'error',
+      'no-undef': 'off',
     },
     languageOptions: {
       globals: {

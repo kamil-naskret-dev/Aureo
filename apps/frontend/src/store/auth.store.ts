@@ -19,6 +19,7 @@ type AuthActions = {
   setAuth: (accessToken: string, user: AuthUser) => void;
   clearAuth: () => void;
   setInitialized: (value: boolean) => void;
+  setUserImage: (image: string | null) => void;
 };
 
 type AuthState = (AuthUnauthenticated | AuthAuthenticated) & AuthActions;
@@ -34,6 +35,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearAuth: () => set({ isAuthenticated: false, user: null, accessToken: null }),
 
   setInitialized: (value) => set({ isInitialized: value }),
+
+  setUserImage: (image) =>
+    set((state) => (state.isAuthenticated ? { user: { ...state.user, image } } : state)),
 }));
 
 export const getAccessToken = () => useAuthStore.getState().accessToken;

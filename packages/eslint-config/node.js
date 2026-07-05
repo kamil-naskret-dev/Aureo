@@ -5,6 +5,7 @@ export default [
   {
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
+      'no-undef': 'off',
     },
   },
 ];
