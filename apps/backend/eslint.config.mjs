@@ -15,6 +15,9 @@ export default tseslint.config(
     },
     rules: {
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
+      // TypeScript already catches undefined references — no-undef doesn't
+      // understand global namespace augmentations from @types (e.g. Express.Multer.File).
+      'no-undef': 'off',
     },
   },
 );

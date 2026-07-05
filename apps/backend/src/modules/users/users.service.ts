@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User, UserStatus } from '@prisma/client';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 import { UserNotFoundException } from '../../common/exceptions/user.exceptions';
 import { CreateUserInputDto } from './dto/create-user.dto';
@@ -49,5 +51,30 @@ export class UsersService {
 
   updatePassword(id: string, hashedPassword: string): Promise<void> {
     return this.repo.updatePassword(id, hashedPassword);
+  }
+
+  async updateAvatar(
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<string> {
+    await this.deleteAvatarFile(userId);
+    const avatarUrl = `/uploads/avatars/${file.filename}`;
+    await this.repo.updateAvatarUrl(userId, avatarUrl);
+    return avatarUrl;
+  }
+
+  async removeAvatar(userId: string): Promise<void> {
+    await this.deleteAvatarFile(userId);
+    await this.repo.updateAvatarUrl(userId, null);
+  }
+
+  private async deleteAvatarFile(userId: string): Promise<void> {
+    const oldUrl = await this.repo.findAvatarUrl(userId);
+    if (!oldUrl) return;
+    const segments = oldUrl.split('/');
+    const filename = segments[segments.length - 1] ?? '';
+    if (!filename) return;
+    const filepath = join(process.cwd(), 'uploads', 'avatars', filename);
+    await unlink(filepath).catch(() => {});
   }
 }

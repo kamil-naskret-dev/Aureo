@@ -63,4 +63,22 @@ export class UsersRepository {
       .updateMany({ where: { id, status: { not: status } }, data: { status } })
       .then();
   }
+
+  async findAvatarUrl(userId: string): Promise<string | null> {
+    const profile = await this.prisma.userProfile.findUnique({
+      where: { userId },
+      select: { avatarUrl: true },
+    });
+    return profile?.avatarUrl ?? null;
+  }
+
+  async updateAvatarUrl(
+    userId: string,
+    avatarUrl: string | null,
+  ): Promise<void> {
+    await this.prisma.userProfile.update({
+      where: { userId },
+      data: { avatarUrl },
+    });
+  }
 }

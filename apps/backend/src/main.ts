@@ -1,9 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { mkdirSync } from 'fs';
+import { join } from 'path';
 import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app.module.js';
@@ -17,7 +20,13 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { AppConfig } from './config/app.config.js';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
+
+  const uploadsDir = join(process.cwd(), 'uploads');
+  mkdirSync(join(uploadsDir, 'avatars'), { recursive: true });
+  app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
 
   app.useLogger(app.get(Logger));
   app.use(cookieParser());
@@ -40,6 +49,7 @@ async function bootstrap(): Promise<void> {
           }
         : false,
       crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
       referrerPolicy: { policy: 'no-referrer' },
       hsts: isProduction
         ? { maxAge: 31_536_000, includeSubDomains: true }
@@ -101,7 +111,6 @@ async function bootstrap(): Promise<void> {
   await app.listen(appConfig.port);
 }
 
-bootstrap().catch((err) => {
-  console.error('Bootstrap failed:', err);
+bootstrap().catch(() => {
   process.exit(1);
 });
