@@ -37,7 +37,14 @@ import { PrismaModule } from './core/prisma/prisma.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const redis = config.getOrThrow<RedisConfig>('redis');
-        return { connection: { host: redis.host, port: redis.port } };
+        return {
+          connection: {
+            host: redis.host,
+            port: redis.port,
+            password: redis.password,
+            tls: redis.tls ? {} : undefined,
+          },
+        };
       },
     }),
 
